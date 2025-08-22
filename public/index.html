@@ -16,13 +16,23 @@
         }
 
         #app {
+            display: none;
+            padding: 8px;
             width: 95%;
             height: 100vh;
             height: 100dvh;
             max-width: 800px;
             margin: 0 auto;
         }
-
+        #app button{
+            display: block;
+            width: 100%;
+            padding: 3px 8px;
+            margin-bottom: 10px;
+            background: #8cdbff;
+            border-radius: 8px;
+            border: 1px solid #00000020;
+        }
         .note {
             border: 1px solid #ccc;
             padding: 10px;
@@ -97,7 +107,7 @@
 
 <body>
 
-    <div id="app" style="display: block">
+    <div id="app">
         <button onclick="editornote()">新增</button>
         <div id="notes"></div>
     </div>
@@ -203,7 +213,7 @@
                 notes.push({ id: Date.now().toString(), title, content });
             };
             saveNotes();
-            renderNotes();
+            login();
         }
 
         function deleteNote(id) {
@@ -211,7 +221,7 @@
             if (!userConfirmed) return;
             notes = notes.filter(note => note.id !== id);
             saveNotes();
-            renderNotes();
+            login();
         }
 
 
