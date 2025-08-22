@@ -1,88 +1,105 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
-  <meta charset="UTF-8">
-  <title>我的笔记本</title>
-  <style>
-    body { font-family: sans-serif; max-width: 700px; margin: 30px auto; }
-    .note { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
-    textarea { width: 100%; height: 80px; }
-    button { margin: 5px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>我的笔记本</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 700px;
+            margin: 30px auto;
+        }
+
+        .note {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+        }
+
+        button {
+            margin: 5px;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>我的笔记本</h1>
-  <div id="login">
-    <p>请输入用户名和密码：</p>
-    <input id="user" placeholder="用户名"><br>
-    <input id="pass" type="password" placeholder="密码"><br>
-    <button onclick="login()">登录</button>
-  </div>
-  <div id="app" style="display:none">
-    <button onclick="addNote()">新增一篇</button>
-    <button onclick="saveNotes()">保存全部</button>
-    <div id="notes"></div>
-  </div>
+    <div id="login">
+        <input id="user" placeholder="用户名"><br>
+        <input id="pass" type="password" placeholder="密码"><br>
+        <button onclick="login()">登录</button>
+    </div>
+    <div id="app" style="display:none">
+        <button onclick="addNote()">新增一篇</button>
+        <button onclick="saveNotes()">保存全部</button>
+        <div id="notes"></div>
+    </div>
 
-  <script>
-    let authHeader = "";
-    let notes = { posts: [] };
+    <script>
+        let authHeader = "";
+        let notes = { posts: [] };
 
-    async function login() {
-      const user = document.getElementById("user").value;
-      const pass = document.getElementById("pass").value;
-      authHeader = "Basic " + btoa(user + ":" + pass);
+        async function login() {
+            const user = document.getElementById("user").value;
+            const pass = document.getElementById("pass").value;
+            authHeader = "Basic " + btoa(user + ":" + pass);
 
-      const res = await fetch("/api/notes", {
-        headers: { Authorization: authHeader }
-      });
-      if (res.status === 401) {
-        alert("用户名或密码错误！");
-        return;
-      }
-      notes = await res.json();
-      document.getElementById("login").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      renderNotes();
-    }
+            const res = await fetch("/api/notes", {
+                headers: { Authorization: authHeader }
+            });
+            if (res.status === 401) {
+                alert("用户名或密码错误！");
+                return;
+            }
+            notes = await res.json();
+            document.getElementById("login").style.display = "none";
+            document.getElementById("app").style.display = "block";
+            renderNotes();
+        }
 
-    function renderNotes() {
-      const container = document.getElementById("notes");
-      container.innerHTML = "";
-      notes.posts.forEach((post, idx) => {
-        const div = document.createElement("div");
-        div.className = "note";
-        div.innerHTML = `
+        function renderNotes() {
+            const container = document.getElementById("notes");
+            container.innerHTML = "";
+            notes.posts.forEach((post, idx) => {
+                const div = document.createElement("div");
+                div.className = "note";
+                div.innerHTML = `
           <input value="${post.title}" 
                  onchange="notes.posts[${idx}].title=this.value"><br>
           <textarea onchange="notes.posts[${idx}].content=this.value">${post.content}</textarea><br>
           <button onclick="deleteNote(${idx})">删除</button>
         `;
-        container.appendChild(div);
-      });
-    }
+                container.appendChild(div);
+            });
+        }
 
-    function addNote() {
-      notes.posts.push({ title: "新建文章", content: "" });
-      renderNotes();
-    }
+        function addNote() {
+            notes.posts.push({ title: "新建文章", content: "" });
+            renderNotes();
+        }
 
-    function deleteNote(idx) {
-      notes.posts.splice(idx, 1);
-      renderNotes();
-    }
+        function deleteNote(idx) {
+            notes.posts.splice(idx, 1);
+            renderNotes();
+        }
 
-    async function saveNotes() {
-      await fetch("/api/notes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authHeader
-        },
-        body: JSON.stringify(notes)
-      });
-      alert("保存成功！");
-    }
-  </script>
+        async function saveNotes() {
+            await fetch("/api/notes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": authHeader
+                },
+                body: JSON.stringify(notes)
+            });
+            alert("保存成功！");
+        }
+    </script>
 </body>
+
 </html>
