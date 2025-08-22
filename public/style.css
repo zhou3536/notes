@@ -1,0 +1,203 @@
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+    animation: fadeIn1 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn1 {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+#app {
+    display: none;
+    padding: 8px;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#app button {
+    display: block;
+    width: 100px;
+    padding: 6px;
+    margin-bottom: 10px;
+    background-color: #c2e3ff;
+    border-radius: 8px;
+    border: 1px solid #00000020;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+#app button:hover {
+    background-color: #91ccff;
+}
+
+.note {
+    cursor: default;
+    padding: 5px 10px;
+    margin: 6px 0;
+    border-radius: 10px;
+    width: fit-content;
+    transition: all 0.3s ease;
+}
+
+.note:hover {
+    background-color: #d2f1ff;
+}
+
+textarea {
+    width: 100%;
+    height: 80px;
+}
+
+
+#noteditor,
+#notedisplay {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    padding: 15px;
+    margin: 0 auto;
+    background-color: #fff;
+    width: 100vw;
+    max-width: 800px;
+    height: 100vh;
+    height: 100dvh;
+    /* animation: fadeIn1 0.4s cubic-bezier(0.4, 0, 0.2, 1); */
+}
+
+#noteditor .title,
+#notedisplay .title {
+    display: flex;
+    gap: 8px;
+    /* align-items: center; */
+    /* justify-items: center; */
+    margin-bottom: 10px;
+}
+
+#noteditor input,
+#notedisplay h3 {
+    display: block;
+    margin-right: auto;
+
+}
+
+#noteditor button,
+#notedisplay button {
+    padding: 3px 8px;
+    display: block;
+    /* margin-left: auto; */
+    width: 60px;
+    height: 30px;
+}
+
+#noteditor input,
+#noteditor textarea {
+    padding: 6px 10px;
+    outline: none;
+    border: 1px solid #00000080;
+    border-radius: 5px;
+}
+
+#noteditor textarea {
+    resize: none;
+    flex: 1;
+    font-family: sans-serif;
+    padding: 10px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+/* From Uiverse.io by SchawnnahJ */
+.loader {
+    position: relative;
+    display: none;
+    width: 2.5em;
+    height: 2.5em;
+    transform: rotate(165deg);
+}
+
+.loader:before,
+.loader:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 0.25em;
+    transform: translate(-50%, -50%);
+}
+
+.loader:before {
+    animation: before8 2s infinite;
+}
+
+.loader:after {
+    animation: after6 2s infinite;
+}
+
+@keyframes before8 {
+    0% {
+        width: 0.5em;
+        box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+    }
+
+    35% {
+        width: 2.5em;
+        box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75);
+    }
+
+    70% {
+        width: 0.5em;
+        box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75);
+    }
+
+    100% {
+        box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+    }
+}
+
+@keyframes after6 {
+    0% {
+        height: 0.5em;
+        box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
+    }
+
+    35% {
+        height: 2.5em;
+        box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75);
+    }
+
+    70% {
+        height: 0.5em;
+        box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75);
+    }
+
+    100% {
+        box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
+    }
+}
+
+.loader {
+    position: absolute;
+    top: calc(50% - 1.25em);
+    left: calc(50% - 1.25em);
+}
