@@ -5,10 +5,22 @@
     <meta charset="UTF-8">
     <title>我的笔记本</title>
     <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: sans-serif;
-            max-width: 700px;
-            margin: 30px auto;
+        }
+
+        #app {
+            width: 95%;
+            height: 100vh;
+            height: 100dvh;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .note {
@@ -22,27 +34,85 @@
             height: 80px;
         }
 
-        button {
-            margin: 5px;
+
+        #noteditor,
+        #notedisplay {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            padding: 15px;
+            margin: 0 auto;
+            background-color: #fff;
+            width: 100vw;
+            max-width: 800px;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        #noteditor .title,
+        #notedisplay .title {
+            display: flex;
+            gap: 8px;
+            /* align-items: center; */
+            /* justify-items: center; */
+            margin-bottom: 10px;
+        }
+
+        #noteditor input,
+        #notedisplay h3 {
+            display: block;
+            margin-right: auto;
+
+        }
+
+        #noteditor button,
+        #notedisplay button {
+            padding: 3px 8px;
+            display: block;
+            /* margin-left: auto; */
+            width: 60px;
+            height: 30px;
+        }
+
+        #noteditor input,
+        #noteditor textarea {
+            padding: 6px 10px;
+            outline: none;
+            border: 1px solid #00000080;
+            border-radius: 3px;
+            width: 100%;
+
+        }
+
+        #noteditor textarea {
+            resize: none;
+            flex: 1;
+            font-family: sans-serif;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="app" style="display: none">
-        <button onclick="addNote()">新增一篇</button>
-        <button onclick="saveNotes()">保存全部</button>
+    <div id="app" style="display: block">
+        <button onclick="editornote()">新增</button>
         <div id="notes"></div>
     </div>
-
+    <div id="notedisplay"></div>
+    <div id="noteditor"></div>
     <script>
         let notes = [];
+        // let notes = [
+        //     { "id": "123", "title": "新建文章", "content": "hello" },
+        //     { "id": "456", "title": "新建文章2", "content": "222333" }
+        // ];
 
         async function login() {
             const res = await fetch("/api/notes");
             if (res.status === 401) return;
-
             notes = await res.json();
             document.getElementById("app").style.display = "block";
             renderNotes();
@@ -50,38 +120,113 @@
         login();
 
         function renderNotes() {
+            document.getElementById('noteditor').style.display = 'none';
+            document.getElementById('notedisplay').style.display = 'none';
             const container = document.getElementById("notes");
             container.innerHTML = "";
-            notes.forEach(() => {
+            notes.forEach((note) => {
                 const div = document.createElement("div");
                 div.className = "note";
-                div.innerHTML = `
-          <input value="${notes.title}" 
-                 onchange="notes.posts[${idx}].title=this.value"><br>
-          <textarea onchange="notes.posts[${idx}].content=this.value">${notes.content}</textarea><br>
-          <button onclick="deleteNote(${idx})">删除</button>
-        `;
+                div.addEventListener('click', () => { displaynote(note) });
+                div.innerHTML = note.title;
                 container.appendChild(div);
+                console.log(note)
             });
+        };
+        // renderNotes();
+        function displaynote(note) {
+            console.log(note)
+            const div = document.getElementById('notedisplay');
+            div.innerHTML = '';
+            div.style.display = 'block';
+            const title = document.createElement("div");
+            title.classList.add('title')
+            const h3 = document.createElement("h3");
+            h3.innerText = note.title;
+            const edtbtn = document.createElement("button");
+            edtbtn.innerText = '编辑';
+            edtbtn.addEventListener('click', () => { editornote(note) });
+            const delbtn = document.createElement("button");
+            delbtn.innerText = '删除';
+            delbtn.addEventListener('click', () => { deleteNote(note.id) });
+            const clsbtn = document.createElement("button");
+            clsbtn.innerText = '关闭';
+            clsbtn.addEventListener('click', () => { div.style.display = 'none' });
+            title.appendChild(h3);
+            title.appendChild(edtbtn);
+            title.appendChild(delbtn);
+            title.appendChild(clsbtn);
+            const p = document.createElement("p");
+            p.innerText = note.content;
+            div.appendChild(title)
+            div.appendChild(p)
+        }
+        function editornote(note) {
+            if (!note) note = { "id": "", "title": "", "content": "" };
+            const div = document.getElementById('noteditor');
+            div.innerHTML = '';
+            div.style.display = 'flex';
+            const title = document.createElement("div");
+            title.classList.add('title')
+            const input = document.createElement("input");
+            input.id = 'notetitle';
+            input.value = note.title;
+            const edtbtn = document.createElement("button");
+            edtbtn.innerText = '提交';
+            edtbtn.addEventListener('click', () => { pushNote(note.id) });
+            const clsbtn = document.createElement("button");
+            clsbtn.innerText = '关闭';
+            clsbtn.addEventListener('click', () => { div.style.display = 'none' });
+            title.appendChild(input);
+            title.appendChild(edtbtn);
+            title.appendChild(clsbtn);
+            const textarea = document.createElement("textarea");
+            textarea.id = 'notecontent';
+            textarea.value = note.content;
+            div.appendChild(title)
+            div.appendChild(textarea)
         }
 
-        function addNote() {
-            notes.posts.push({ title: "新建文章", content: "" });
+        function pushNote(id) {
+            const title = document.getElementById('notetitle').value;
+            const content = document.getElementById('notecontent').value;
+            if (!title || !content) return;
+            if (id) {
+                const index = notes.findIndex(note => note.id === id);
+                if (index !== -1) {
+                    notes[index].title = title;
+                    notes[index].content = content;
+                } else {
+                    notes.push({ id: Date.now().toString(), title, content });
+                }
+            } else {
+                notes.push({ id: Date.now().toString(), title, content });
+            };
+            saveNotes();
             renderNotes();
         }
 
-        function deleteNote(idx) {
-            notes.posts.splice(idx, 1);
+        function deleteNote(id) {
+            const userConfirmed = confirm('您确定要删除吗？');
+            if (!userConfirmed) return;
+            notes = notes.filter(note => note.id !== id);
+            saveNotes();
             renderNotes();
         }
+
+
 
         async function saveNotes() {
-            await fetch("/api/notes", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(notes)
-            });
-            alert("保存成功！");
+            try {
+                await fetch("/api/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(notes)
+                });
+            } catch {
+                alert("保存失败！");
+            }
+
         }
     </script>
 </body>
