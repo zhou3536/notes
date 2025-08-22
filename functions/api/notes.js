@@ -1,4 +1,4 @@
-import { checkAuth } from "../../utils/auth";
+import { checkAuth } from "../utils/auth";
 
 export async function onRequestGet(context) {
   if (!checkAuth(context.request, context.env)) {
