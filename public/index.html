@@ -38,19 +38,31 @@
 
         #app button {
             display: block;
-            width: 100%;
+            width: 100px;
             padding: 6px;
             margin-bottom: 10px;
-            background: #c2e3ff;
+            background-color: #c2e3ff;
             border-radius: 8px;
             border: 1px solid #00000020;
-            font-size: 16px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        #app button:hover {
+            background-color: #91ccff;
         }
 
         .note {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px 0;
+            cursor: default;
+            padding: 5px 10px;
+            margin: 6px 0;
+            border-radius: 10px;
+            width: fit-content;
+            transition: all 0.3s ease;
+        }
+
+        .note:hover {
+            background-color: #d2f1ff;
         }
 
         textarea {
@@ -74,7 +86,7 @@
             max-width: 800px;
             height: 100vh;
             height: 100dvh;
-            animation: fadeIn1 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* animation: fadeIn1 0.4s cubic-bezier(0.4, 0, 0.2, 1); */
         }
 
         #noteditor .title,
@@ -107,15 +119,16 @@
             padding: 6px 10px;
             outline: none;
             border: 1px solid #00000080;
-            border-radius: 3px;
-            width: 100%;
-
+            border-radius: 5px;
         }
 
         #noteditor textarea {
             resize: none;
             flex: 1;
             font-family: sans-serif;
+            padding: 10px;
+            border-radius: 6px;
+            width: 100%;
         }
     </style>
 </head>
@@ -123,7 +136,7 @@
 <body>
 
     <div id="app">
-        <button onclick="editornote()">新增记录</button>
+        <button onclick="editornote()">AddNote</button>
         <div id="notes"></div>
     </div>
     <div id="notedisplay"></div>
@@ -132,7 +145,7 @@
         let notes = [];
         // let notes = [
         //     { "id": "123", "title": "新建文章", "content": "hello" },
-        //     { "id": "456", "title": "新建文章2", "content": "222333" }
+        //     { "id": "456", "title": "新建文章2", "content": "000000000000000000000000000000000000000000" }
         // ];
 
         async function login() {
@@ -145,22 +158,21 @@
         login();
 
         function renderNotes() {
+            console.log(notes)
             document.getElementById('noteditor').style.display = 'none';
             document.getElementById('notedisplay').style.display = 'none';
             const container = document.getElementById("notes");
             container.innerHTML = "";
-            notes.forEach((note) => {
+            notes.forEach((note, index) => {
                 const div = document.createElement("div");
                 div.className = "note";
                 div.addEventListener('click', () => { displaynote(note) });
-                div.innerHTML = note.title;
+                div.innerText = `${index + 1}. ${note.title}`;
                 container.appendChild(div);
-                console.log(note)
             });
         };
         // renderNotes();
         function displaynote(note) {
-            console.log(note)
             const div = document.getElementById('notedisplay');
             div.innerHTML = '';
             div.style.display = 'block';
@@ -212,49 +224,71 @@
             div.appendChild(textarea)
         }
 
-        async function pushNote(id) {
+        async function pushNote(id1) {
+            const id = id1 || Date.now().toString();
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
             if (!title || !content) return;
-            if (id) {
-                const index = notes.findIndex(note => note.id === id);
-                if (index !== -1) {
-                    notes[index].title = title;
-                    notes[index].content = content;
-                } else {
-                    notes.push({ id: Date.now().toString(), title, content });
-                }
+            const initialNotes = [...notes];
+
+            const index = notes.findIndex(note => note.id === id);
+            if (index !== -1) {
+                notes[index].title = title;
+                notes[index].content = content;
             } else {
-                notes.push({ id: Date.now().toString(), title, content });
+                notes.push({ id, title, content });
             };
-            await saveNotes();
-            renderNotes();
+
+            const saveSuccessful = await saveNotes();
+            // const saveSuccessful = '00';
+            if (saveSuccessful) {
+                renderNotes();
+                const note = notes.find(n => n.id === id);
+                displaynote(note);
+            } else {
+                notes = initialNotes;
+            }
         }
 
         async function deleteNote(id) {
             const userConfirmed = confirm('您确定要删除吗？');
             if (!userConfirmed) return;
+            const initialNotes = [...notes];
             notes = notes.filter(note => note.id !== id);
-            await saveNotes();
-            renderNotes();
+            const saveSuccessful = await saveNotes();
+            if (saveSuccessful) {
+                renderNotes();
+            } else {
+                notes = initialNotes;
+            }
         }
 
 
 
         async function saveNotes() {
-            document.body.style.cursor = 'wait'
+            document.body.style.cursor = 'wait';
             try {
-                await fetch("/api/notes", {
+                const response = await fetch("/api/notes", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(notes)
                 });
-            } catch {
-                alert("保存失败！");
+
+                if (response.ok) {
+                    return true;
+                } else {
+                    const errorData = await response.text();
+                    console.error(`Save failed with status ${response.status}:`);
+                    alert(`保存失败：${response.status}`);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Network or fetch error during save:", error);
+                alert("保存失败！请检查您的网络连接。");
+                return false;
             } finally {
                 document.body.style.cursor = 'default';
             }
-
         }
     </script>
 </body>
