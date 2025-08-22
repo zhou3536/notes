@@ -29,11 +29,12 @@
 </head>
 
 <body>
-    <!-- <div id="login">
+    <div id="login">
+        <p>请输入用户名和密码：</p>
         <input id="user" placeholder="用户名"><br>
         <input id="pass" type="password" placeholder="密码"><br>
         <button onclick="login()">登录</button>
-    </div> -->
+    </div>
     <div id="app" style="display:none">
         <button onclick="addNote()">新增一篇</button>
         <button onclick="saveNotes()">保存全部</button>
@@ -45,9 +46,9 @@
         let notes = { posts: [] };
 
         async function login() {
-            // const user = document.getElementById("user").value;
-            // const pass = document.getElementById("pass").value;
-            // authHeader = "Basic " + btoa(user + ":" + pass);
+            const user = document.getElementById("user").value;
+            const pass = document.getElementById("pass").value;
+            authHeader = "Basic " + btoa(user + ":" + pass);
 
             const res = await fetch("/api/notes", {
                 headers: { Authorization: authHeader }
@@ -57,11 +58,11 @@
                 return;
             }
             notes = await res.json();
-            // document.getElementById("login").style.display = "none";
+            document.getElementById("login").style.display = "none";
             document.getElementById("app").style.display = "block";
             renderNotes();
         }
-        login();
+
         function renderNotes() {
             const container = document.getElementById("notes");
             container.innerHTML = "";
