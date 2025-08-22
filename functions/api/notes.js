@@ -6,7 +6,7 @@ export async function onRequestGet(context) {
   }
 
   const data = await context.env.NOTES_KV.get("notes:data");
-  return new Response(data || '{"posts":[]}', { headers: { "Content-Type": "application/json" } });
+  return new Response(data || '[]', { headers: { "Content-Type": "application/json" } });
 }
 
 export async function onRequestPost(context) {
