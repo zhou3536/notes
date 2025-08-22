@@ -13,10 +13,21 @@
 
         body {
             font-family: sans-serif;
+            animation: fadeIn1 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn1 {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         #app {
-            display: none;
+            /* display: none; */
             padding: 8px;
             width: 95%;
             height: 100vh;
@@ -24,15 +35,18 @@
             max-width: 800px;
             margin: 0 auto;
         }
-        #app button{
+
+        #app button {
             display: block;
             width: 100%;
-            padding: 3px 8px;
+            padding: 6px;
             margin-bottom: 10px;
-            background: #8cdbff;
+            background: #c2e3ff;
             border-radius: 8px;
             border: 1px solid #00000020;
+            font-size: 16px;
         }
+
         .note {
             border: 1px solid #ccc;
             padding: 10px;
@@ -60,6 +74,7 @@
             max-width: 800px;
             height: 100vh;
             height: 100dvh;
+            animation: fadeIn1 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         #noteditor .title,
@@ -108,7 +123,7 @@
 <body>
 
     <div id="app">
-        <button onclick="editornote()">新增</button>
+        <button onclick="editornote()">新增记录</button>
         <div id="notes"></div>
     </div>
     <div id="notedisplay"></div>
@@ -197,7 +212,7 @@
             div.appendChild(textarea)
         }
 
-        function pushNote(id) {
+        async function pushNote(id) {
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
             if (!title || !content) return;
@@ -212,21 +227,22 @@
             } else {
                 notes.push({ id: Date.now().toString(), title, content });
             };
-            saveNotes();
-            login();
+            await saveNotes();
+            renderNotes();
         }
 
-        function deleteNote(id) {
+        async function deleteNote(id) {
             const userConfirmed = confirm('您确定要删除吗？');
             if (!userConfirmed) return;
             notes = notes.filter(note => note.id !== id);
-            saveNotes();
-            login();
+            await saveNotes();
+            renderNotes();
         }
 
 
 
         async function saveNotes() {
+            document.body.style.cursor = 'wait'
             try {
                 await fetch("/api/notes", {
                     method: "POST",
@@ -235,6 +251,8 @@
                 });
             } catch {
                 alert("保存失败！");
+            } finally {
+                document.body.style.cursor = 'default';
             }
 
         }
