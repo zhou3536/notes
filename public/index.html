@@ -16,24 +16,28 @@
         <button onclick="editornote()">AddNote</button>
         <div id="notes"></div>
     </div>
-    <div id="notedisplay"></div>
-    <div id="noteditor"></div>
+    <div id="notedisplay" class="notedisplay"></div>
+    <div id="noteditor" class="noteditor"></div>
     <div class="loader" id="loader"></div>
     <script>
         let notes = [];
-        // let notes = [
-        //     { "id": "123", "title": "新建文章", "content": "hello" },
-        //     { "id": "456", "title": "新建文章2", "content": "0000000" }
-        // ];
+        const loader = document.getElementById('loader');
         const noteditorBOX = document.getElementById('noteditor');
         const notedisplayBOX = document.getElementById('notedisplay');
         const container = document.getElementById("notes");
         async function login() {
-            const res = await fetch("/api/notes");
-            if (res.status === 401) return;
-            notes = await res.json();
-            document.getElementById("app").style.display = "block";
-            renderNotes();
+            try {
+                loader.style.display = 'block';
+                // const res = await fetch("1.json");  // test
+                const res = await fetch("/api/notes");
+                if (res.status === 401) return;
+                notes = await res.json();
+
+                document.getElementById("app").style.display = "block";
+                renderNotes();
+            } finally {
+                loader.style.display = 'none';
+            }
         }
         login();
 
@@ -50,7 +54,7 @@
                 container.appendChild(div);
             });
         };
-        // renderNotes();
+
         function displaynote(note) {
             const div = document.getElementById('notedisplay');
             div.innerHTML = '';
@@ -89,14 +93,18 @@
             input.placeholder = "输入标题..."
             input.id = 'notetitle';
             input.value = note.title;
-            const edtbtn = document.createElement("button");
-            edtbtn.innerText = '提交';
-            edtbtn.addEventListener('click', () => { pushNote(note.id) });
+            const sumbtn = document.createElement("button");
+            sumbtn.innerText = '提交';
+            sumbtn.addEventListener('click', () => { pushNote(note.id) });
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '关闭';
             clsbtn.addEventListener('click', () => { div.style.display = 'none' });
+            const prvbtn = document.createElement("button");
+            prvbtn.innerText = '预览';
+            prvbtn.addEventListener('click', () => { previewnote() });
             title.appendChild(input);
-            title.appendChild(edtbtn);
+            title.appendChild(prvbtn);
+            title.appendChild(sumbtn);
             title.appendChild(clsbtn);
             const textarea = document.createElement("textarea");
             textarea.placeholder = "输入内容..."
@@ -105,7 +113,28 @@
             div.appendChild(title)
             div.appendChild(textarea)
         }
-
+        function previewnote() {
+            const titletext = document.getElementById('notetitle').value;
+            const contentext = document.getElementById('notecontent').value;
+            const div = document.createElement("div");
+            div.classList.add('notedisplay');
+            div.style.display = 'block';
+            const title = document.createElement("div");
+            title.classList.add('title');
+            const h3 = document.createElement("h3");
+            h3.innerText = titletext;
+            const clsbtn = document.createElement("button");
+            clsbtn.innerText = '关闭';
+            clsbtn.addEventListener('click', () => { div.remove() });
+            title.appendChild(h3);
+            title.appendChild(clsbtn);
+            const mddiv = document.createElement("div");
+            mddiv.classList.add('markdown-body');
+            mddiv.innerHTML = marked.parse(contentext);
+            div.appendChild(title);
+            div.appendChild(mddiv);
+            document.body.appendChild(div);
+        }
         async function pushNote(id1) {
             const id = id1 || Date.now().toString();
             const title = document.getElementById('notetitle').value;
@@ -122,7 +151,7 @@
             };
 
             const saveSuccessful = await saveNotes();
-            // const saveSuccessful = '00';
+            // const saveSuccessful = '00';  // test
             if (saveSuccessful) {
                 renderNotes();
                 const note = notes.find(n => n.id === id);
@@ -146,7 +175,6 @@
         }
 
 
-        const loader = document.getElementById('loader');
         async function saveNotes() {
             loader.style.display = 'block';
             try {
