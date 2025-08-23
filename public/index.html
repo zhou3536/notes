@@ -153,13 +153,12 @@
                 renderNotes();
                 const note = notes.find(n => n.id === id);
                 displaynote(note);
-            } else {
-            }
-        }
+            };
+        };
 
         async function saveNotes(id, title, content) {
-            loader.style.display = 'block';
             if (!id || !title || !content) return;
+            loader.style.display = 'block';
             try {
                 const response = await fetch("/api/notes", {
                     method: "POST",
