@@ -33,13 +33,12 @@ export async function onRequestPost(context) {
   return new Response("OK", { status: 200 });
 }
 
-// DELETE: 删除一个 note
 export async function onRequestDelete(context) {
   if (!checkAuth(context.request, context.env)) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const body = await context.request.json(); // { id }
+  const body = await context.request.json();
   if (!body.id) {
     return new Response("Missing id", { status: 400 });
   }
