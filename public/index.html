@@ -140,54 +140,36 @@
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
             if (!title || !content) return;
-            const initialNotes = [...notes];
 
-            const index = notes.findIndex(note => note.id === id);
-            if (index !== -1) {
-                notes[index].title = title;
-                notes[index].content = content;
-            } else {
-                notes.push({ id, title, content });
-            };
-
-            const saveSuccessful = await saveNotes();
-            // const saveSuccessful = '00';  // test
+            const saveSuccessful = await saveNotes(id, title, content);
             if (saveSuccessful) {
+                const index = notes.findIndex(note => note.id === id);
+                if (index !== -1) {
+                    notes[index].title = title;
+                    notes[index].content = content;
+                } else {
+                    notes.push({ id, title, content });
+                };
                 renderNotes();
                 const note = notes.find(n => n.id === id);
                 displaynote(note);
             } else {
-                notes = initialNotes;
             }
         }
 
-        async function deleteNote(id) {
-            const userConfirmed = confirm('您确定要删除吗？');
-            if (!userConfirmed) return;
-            const initialNotes = [...notes];
-            notes = notes.filter(note => note.id !== id);
-            const saveSuccessful = await saveNotes();
-            if (saveSuccessful) {
-                renderNotes();
-            } else {
-                notes = initialNotes;
-            }
-        }
-
-
-        async function saveNotes() {
+        async function saveNotes(id, title, content) {
             loader.style.display = 'block';
+            if (!id || !title || !content) return;
             try {
                 const response = await fetch("/api/notes", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(notes)
+                    body: JSON.stringify({ id, title, content })
                 });
 
                 if (response.ok) {
                     return true;
                 } else {
-                    const errorData = await response.text();
                     console.error(`Save failed with status ${response.status}:`);
                     alert(`保存失败：${response.status}`);
                     return false;
@@ -196,6 +178,33 @@
                 console.error("Network or fetch error during save:", error);
                 alert("保存失败！请检查您的网络连接。");
                 return false;
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+
+        async function deleteNote(id) {
+            const userConfirmed = confirm('您确定要删除吗？');
+            if (!userConfirmed) return;
+
+            loader.style.display = 'block';
+            try {
+                const response = await fetch("/api/notes", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id })
+                });
+                if (response.ok) {
+                    notes = notes.filter(note => note.id !== id);
+                    renderNotes();
+                } else {
+                    console.error(`Delete failed with status ${response.status}:`);
+                    alert(`删除失败：${response.status}`);
+                }
+            } catch (error) {
+                console.error("Network or fetch error during delete:", error);
+                alert("删除失败！请检查您的网络连接。");
+                notes = initialNotes;
             } finally {
                 loader.style.display = 'none';
             }

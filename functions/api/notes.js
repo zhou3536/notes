@@ -5,8 +5,17 @@ export async function onRequestGet(context) {
     return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": "Basic" } });
   }
 
-  const data = await context.env.NOTES_KV.get("notes:data");
-  return new Response(data || '[]', { headers: { "Content-Type": "application/json" } });
+  const list = await context.env.NOTES_KV.list({ prefix: "note:" });
+  const results = [];
+
+  for (const key of list.keys) {
+    const value = await context.env.NOTES_KV.get(key.name, { type: "json" });
+    if (value) results.push(value);
+  }
+
+  return new Response(JSON.stringify(results), {
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 export async function onRequestPost(context) {
@@ -15,19 +24,27 @@ export async function onRequestPost(context) {
   }
 
   const body = await context.request.json();
-
-  const oldData = await context.env.NOTES_KV.get("notes:data");
-
-  if (oldData) {
-    const now = new Date();
-    const timeStr = now.toISOString().replace(/[:.]/g, "-"); 
-    const backupKey = `notes:data:${timeStr}`;
-    await context.env.NOTES_KV.put(backupKey, oldData, {
-      expirationTtl: 7 * 24 * 60 * 60,
-    });
+  if (!body.id) {
+    return new Response("Missing id", { status: 400 });
   }
 
-  await context.env.NOTES_KV.put("notes:data", JSON.stringify(body));
+  await context.env.NOTES_KV.put(`note:${body.id}`, JSON.stringify(body));
+
+  return new Response("OK", { status: 200 });
+}
+
+// DELETE: 删除一个 note
+export async function onRequestDelete(context) {
+  if (!checkAuth(context.request, context.env)) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const body = await context.request.json(); // { id }
+  if (!body.id) {
+    return new Response("Missing id", { status: 400 });
+  }
+
+  await context.env.NOTES_KV.delete(`note:${body.id}`);
 
   return new Response("OK", { status: 200 });
 }
