@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="md.css">
+    <script src="marked.umd.js"></script>
 </head>
 
 <body>
@@ -21,9 +23,11 @@
         let notes = [];
         // let notes = [
         //     { "id": "123", "title": "新建文章", "content": "hello" },
-        //     { "id": "456", "title": "新建文章2", "content": "000000000000000000000000000000000000000000" }
+        //     { "id": "456", "title": "新建文章2", "content": "0000000" }
         // ];
-
+        const noteditorBOX = document.getElementById('noteditor');
+        const notedisplayBOX = document.getElementById('notedisplay');
+        const container = document.getElementById("notes");
         async function login() {
             const res = await fetch("/api/notes");
             if (res.status === 401) return;
@@ -34,10 +38,9 @@
         login();
 
         function renderNotes() {
-            console.log(notes)
-            document.getElementById('noteditor').style.display = 'none';
-            document.getElementById('notedisplay').style.display = 'none';
-            const container = document.getElementById("notes");
+            noteditorBOX.style.display = 'none';
+            notedisplayBOX.style.display = 'none';
+            container.style.display = 'block';
             container.innerHTML = "";
             notes.forEach((note, index) => {
                 const div = document.createElement("div");
@@ -69,10 +72,11 @@
             title.appendChild(edtbtn);
             title.appendChild(delbtn);
             title.appendChild(clsbtn);
-            const p = document.createElement("p");
-            p.innerText = note.content;
+            const mddiv = document.createElement("div");
+            mddiv.classList.add('markdown-body');
+            mddiv.innerHTML = marked.parse(note.content);
             div.appendChild(title)
-            div.appendChild(p)
+            div.appendChild(mddiv)
         }
         function editornote(note) {
             if (!note) note = { "id": "", "title": "", "content": "" };
@@ -82,7 +86,7 @@
             const title = document.createElement("div");
             title.classList.add('title')
             const input = document.createElement("input");
-            input.placeholder="输入标题..."
+            input.placeholder = "输入标题..."
             input.id = 'notetitle';
             input.value = note.title;
             const edtbtn = document.createElement("button");
@@ -95,7 +99,7 @@
             title.appendChild(edtbtn);
             title.appendChild(clsbtn);
             const textarea = document.createElement("textarea");
-            textarea.placeholder="输入内容..."
+            textarea.placeholder = "输入内容..."
             textarea.id = 'notecontent';
             textarea.value = note.content;
             div.appendChild(title)
