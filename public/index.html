@@ -82,6 +82,7 @@
             const title = document.createElement("div");
             title.classList.add('title')
             const input = document.createElement("input");
+            input.placeholder="输入标题..."
             input.id = 'notetitle';
             input.value = note.title;
             const edtbtn = document.createElement("button");
@@ -94,6 +95,7 @@
             title.appendChild(edtbtn);
             title.appendChild(clsbtn);
             const textarea = document.createElement("textarea");
+            textarea.placeholder="输入内容..."
             textarea.id = 'notecontent';
             textarea.value = note.content;
             div.appendChild(title)
