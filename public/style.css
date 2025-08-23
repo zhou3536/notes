@@ -45,7 +45,8 @@ body {
     margin-bottom: 5px;
     font-size: 17px;
     border: none;
-    background: linear-gradient(to right, #006b95, #99009c) no-repeat;
+    color: #004dba;
+    background: linear-gradient(to right, #886800, #7e0019) no-repeat;
     background-size: 0 2px;
     background-position: center bottom;
     transition: all 0.3s ease;
