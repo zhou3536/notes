@@ -33,7 +33,7 @@ body {
     padding: 8px;
     height: 100vh;
     height: 100dvh;
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     animation: fadeIn1 0.3s ease-in-out;
 }
@@ -87,7 +87,7 @@ textarea {
     margin: 0 auto;
     background-color: #fff;
     width: 100vw;
-    max-width: 800px;
+    max-width: 1000px;
     height: 100vh;
     height: 100dvh;
     animation: fadeIn2 0.15s ease;

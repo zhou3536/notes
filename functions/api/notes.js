@@ -15,6 +15,20 @@ export async function onRequestPost(context) {
   }
 
   const body = await context.request.json();
+
+  const oldData = await context.env.NOTES_KV.get("notes:data");
+
+  if (oldData) {
+    const now = new Date();
+    const timeStr = now.toISOString().replace(/[:.]/g, "-"); 
+    const backupKey = `notes:data:${timeStr}`;
+    await context.env.NOTES_KV.put(backupKey, oldData, {
+      expirationTtl: 7 * 24 * 60 * 60,
+    });
+  }
+
   await context.env.NOTES_KV.put("notes:data", JSON.stringify(body));
+
   return new Response("OK", { status: 200 });
 }
+
