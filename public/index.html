@@ -58,9 +58,19 @@
         async function renderNote(id) {
             if (!id) return;
             window.location.hash = id;
-            const res = await fetch(`/api/notes?key=note:${id}`);
-            if (res.status === 401) return;
-            note = await res.json();
+            loader.style.display = 'block';
+            try {
+                const res = await fetch(`/api/notes?key=note:${id}`);
+                if (res.ok) {
+                    note = await res.json();
+                } else {
+                    note = { id, title: "加载失败", content: `加载失败，错误${res.status}` };
+                }
+            } catch (err) {
+                note = { id, title: "加载失败", content: `加载失败，网络错误：${err.message}` };
+            } finally {
+                loader.style.display = 'none';
+            }
             const div = document.getElementById('notedisplay');
             div.innerHTML = '';
             div.style.display = 'block';
@@ -154,7 +164,7 @@
                 if (index !== -1) {
                     notes[index].title = title;
                 } else {
-                    notes.push({ id, title});
+                    notes.push({ id, title });
                 };
                 renderNotes();
                 renderNote(id);
