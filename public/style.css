@@ -71,12 +71,6 @@ body {
     background-position: center bottom;
 }
 
-textarea {
-    width: 100%;
-    height: 80px;
-}
-
-
 .noteditor,
 .notedisplay {
     display: none;
@@ -134,14 +128,14 @@ textarea {
 }
 
 .noteditor .title input,
-.noteditor .title textarea {
+.noteditor textarea {
     padding: 6px 10px;
     outline: none;
     border: 2px solid #002a4550;
     border-radius: 5px;
 }
 
-.noteditor .title textarea {
+.noteditor textarea {
     resize: none;
     flex: 1;
     font-family: sans-serif;
