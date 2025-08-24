@@ -59,6 +59,8 @@
             if (!id) return;
             window.location.hash = id;
             loader.style.display = 'block';
+            notedisplayBOX.innerHTML = '';
+            notedisplayBOX.style.display = 'block';
             try {
                 const res = await fetch(`/api/notes?key=note:${id}`);
                 if (res.ok) {
@@ -71,9 +73,6 @@
             } finally {
                 loader.style.display = 'none';
             }
-            const div = document.getElementById('notedisplay');
-            div.innerHTML = '';
-            div.style.display = 'block';
             const title = document.createElement("div");
             title.classList.add('title')
             const h3 = document.createElement("h3");
@@ -86,7 +85,7 @@
             delbtn.addEventListener('click', () => { deleteNote(note.id) });
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '关闭';
-            clsbtn.addEventListener('click', () => { div.style.display = 'none'; window.location.hash = "" });
+            clsbtn.addEventListener('click', () => { notedisplayBOX.style.display = 'none'; window.location.hash = "" });
             title.appendChild(h3);
             title.appendChild(edtbtn);
             title.appendChild(delbtn);
@@ -94,14 +93,13 @@
             const mddiv = document.createElement("div");
             mddiv.classList.add('markdown-body');
             mddiv.innerHTML = marked.parse(note.content);
-            div.appendChild(title)
-            div.appendChild(mddiv)
+            notedisplayBOX.appendChild(title)
+            notedisplayBOX.appendChild(mddiv)
         }
         function editornote(note) {
             if (!note) note = { "id": "", "title": "", "content": "" };
-            const div = document.getElementById('noteditor');
-            div.innerHTML = '';
-            div.style.display = 'flex';
+            noteditorBOX.innerHTML = '';
+            noteditorBOX.style.display = 'flex';
             const title = document.createElement("div");
             title.classList.add('title')
             const input = document.createElement("input");
@@ -113,7 +111,7 @@
             sumbtn.addEventListener('click', () => { pushNote(note.id) });
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '关闭';
-            clsbtn.addEventListener('click', () => { div.style.display = 'none' });
+            clsbtn.addEventListener('click', () => { noteditorBOX.style.display = 'none' });
             const prvbtn = document.createElement("button");
             prvbtn.innerText = '预览';
             prvbtn.addEventListener('click', () => { previewnote() });
@@ -125,8 +123,8 @@
             textarea.placeholder = "输入内容..."
             textarea.id = 'notecontent';
             textarea.value = note.content;
-            div.appendChild(title)
-            div.appendChild(textarea)
+            noteditorBOX.appendChild(title)
+            noteditorBOX.appendChild(textarea)
         }
         function previewnote() {
             const titletext = document.getElementById('notetitle').value;
@@ -167,7 +165,6 @@
                     notes.push({ id, title });
                 };
                 renderNotes();
-                renderNote(id);
             };
         };
 
