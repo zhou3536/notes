@@ -213,14 +213,11 @@
             }
         };
 
-        // window.addEventListener('hashchange', HashChange);
         function HashChange() {
             const hash = window.location.hash;
             if (!hash) return
             const id = hash.slice(1);
-            console.log(id)
             const note = notes.find(note => note.id === id);
-            console.log(note);
             if (note) displaynote(note);
         };
     </script>
