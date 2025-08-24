@@ -104,12 +104,12 @@ textarea {
 }
 
 .noteditor input,
-.notedisplay h3 {
-    display: inline-block;
+.notedisplay>h3 {
+    display: block;
     margin-right: auto;
 }
 
-.notedisplay h3 {
+.notedisplay>h3 {
     color: #004dba;
     min-width: calc(100% - 150px);
     overflow-wrap: break-word;
@@ -118,7 +118,7 @@ textarea {
 
 .noteditor button,
 .notedisplay button {
-    display: inline-block;
+    display: block;
     width: 40px;
     min-width: 40px;
     height: 25px;
