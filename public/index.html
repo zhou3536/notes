@@ -32,7 +32,6 @@
                 const res = await fetch("/api/notes");
                 if (res.status === 401) return;
                 notes = await res.json();
-
                 document.getElementById("app").style.display = "block";
                 renderNotes();
             } finally {
@@ -53,9 +52,12 @@
                 div.innerText = `${index + 1}. ${note.title}`;
                 container.appendChild(div);
             });
+            HashChange();
         };
 
         function displaynote(note) {
+            if (!note) return;
+            window.location.hash = note.id;
             const div = document.getElementById('notedisplay');
             div.innerHTML = '';
             div.style.display = 'block';
@@ -71,7 +73,7 @@
             delbtn.addEventListener('click', () => { deleteNote(note.id) });
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '关闭';
-            clsbtn.addEventListener('click', () => { div.style.display = 'none' });
+            clsbtn.addEventListener('click', () => { div.style.display = 'none'; window.location.hash = "" });
             title.appendChild(h3);
             title.appendChild(edtbtn);
             title.appendChild(delbtn);
@@ -143,6 +145,7 @@
             if (!title || !content) return;
 
             const saveSuccessful = await saveNotes(id, title, content);
+            // const saveSuccessful = true; //test
             if (saveSuccessful) {
                 const index = notes.findIndex(note => note.id === id);
                 if (index !== -1) {
@@ -208,7 +211,18 @@
             } finally {
                 loader.style.display = 'none';
             }
-        }
+        };
+
+        // window.addEventListener('hashchange', HashChange);
+        function HashChange() {
+            const hash = window.location.hash;
+            if (!hash) return
+            const id = hash.slice(1);
+            console.log(id)
+            const note = notes.find(note => note.id === id);
+            console.log(note);
+            if (note) displaynote(note);
+        };
     </script>
 </body>
 
