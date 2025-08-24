@@ -108,7 +108,7 @@
             input.value = note.title;
             const sumbtn = document.createElement("button");
             sumbtn.innerText = '提交';
-            sumbtn.addEventListener('click', () => { pushNote(note.id) });
+            sumbtn.addEventListener('click', () => { saveNotes(note.id) });
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '关闭';
             clsbtn.addEventListener('click', () => { noteditorBOX.style.display = 'none' });
@@ -149,27 +149,12 @@
             div.appendChild(mddiv);
             document.body.appendChild(div);
         }
-        async function pushNote(id1) {
+      
+        async function saveNotes(id1) {
             const id = id1 || Date.now().toString();
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
-            if (!title || !content) return;
-
-            const saveSuccessful = await saveNotes(id, title, content);
-            // const saveSuccessful = true; //test
-            if (saveSuccessful) {
-                const index = notes.findIndex(note => note.id === id);
-                if (index !== -1) {
-                    notes[index].title = title;
-                } else {
-                    notes.push({ id, title });
-                };
-                renderNotes();
-            };
-        };
-
-        async function saveNotes(id, title, content) {
-            if (!id || !title || !content) return;
+            if (title || !content) return;
             loader.style.display = 'block';
             try {
                 const response = await fetch("/api/notes", {
@@ -179,6 +164,13 @@
                 });
 
                 if (response.ok) {
+                    const index = notes.findIndex(note => note.id === id);
+                    if (index !== -1) {
+                        notes[index].title = title;
+                    } else {
+                        notes.push({ id, title });
+                    };
+                    renderNotes();
                     return true;
                 } else {
                     console.error(`Save failed with status ${response.status}:`);
