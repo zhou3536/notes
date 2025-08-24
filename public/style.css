@@ -103,21 +103,21 @@ textarea {
     padding-right: 6px;
 }
 
-.noteditor input,
-.notedisplay>h3 {
+.noteditor .title input,
+.notedisplay .title h3 {
     display: block;
     margin-right: auto;
 }
 
-.notedisplay>h3 {
+.notedisplay .title h3 {
     color: #004dba;
     min-width: calc(100% - 150px);
     overflow-wrap: break-word;
     padding: 0 5px;
 }
 
-.noteditor button,
-.notedisplay button {
+.noteditor .title button,
+.notedisplay .title button {
     display: block;
     width: 40px;
     min-width: 40px;
@@ -128,20 +128,20 @@ textarea {
     transition: all 0.3s ease;
 }
 
-.noteditor button:hover,
-.notedisplay button:hover {
+.noteditor .title button:hover,
+.notedisplay .title button:hover {
     background-color: #b9d9ff;
 }
 
-.noteditor input,
-.noteditor textarea {
+.noteditor .title input,
+.noteditor .title textarea {
     padding: 6px 10px;
     outline: none;
     border: 2px solid #002a4550;
     border-radius: 5px;
 }
 
-.noteditor textarea {
+.noteditor .title textarea {
     resize: none;
     flex: 1;
     font-family: sans-serif;
