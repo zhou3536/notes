@@ -66,7 +66,7 @@
                 if (res.ok) {
                     note = await res.json();
                 } else {
-                    note = { id, title: "加载失败", content: `加载失败，错误${res.status}` };
+                    note = { id, title: "加载失败", content: `加载失败，错误代码${res.status}` };
                 }
             } catch (err) {
                 note = { id, title: "加载失败", content: `加载失败，网络错误：${err.message}` };
