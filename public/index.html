@@ -116,6 +116,7 @@
         function previewnote() {
             const titletext = document.getElementById('notetitle').value;
             const contentext = document.getElementById('notecontent').value;
+            if (!contentext) return;
             const div = document.createElement("div");
             div.classList.add('notedisplay');
             div.style.display = 'block';
