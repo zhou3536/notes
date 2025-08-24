@@ -154,7 +154,7 @@
             const id = id1 || Date.now().toString();
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
-            if (title || !content) return;
+            if (!title || !content) return;
             loader.style.display = 'block';
             try {
                 const response = await fetch("/api/notes", {
