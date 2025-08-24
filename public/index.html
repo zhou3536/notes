@@ -29,7 +29,7 @@
             try {
                 loader.style.display = 'block';
                 // const res = await fetch("1.json");  // test
-                const res = await fetch("/api/notes");
+                const res = await fetch("/api/notes?key=AllNotes");
                 if (res.status === 401) return;
                 notes = await res.json();
                 document.getElementById("app").style.display = "block";
@@ -48,16 +48,19 @@
             notes.forEach((note, index) => {
                 const div = document.createElement("div");
                 div.className = "note";
-                div.addEventListener('click', () => { displaynote(note) });
+                div.addEventListener('click', () => { renderNote(note.id) });
                 div.innerText = `${index + 1}. ${note.title}`;
                 container.appendChild(div);
             });
             HashChange();
         };
 
-        function displaynote(note) {
-            if (!note) return;
-            window.location.hash = note.id;
+        async function renderNote(id) {
+            if (!id) return;
+            window.location.hash = id;
+            const res = await fetch(`/api/notes?key=note:${id}`);
+            if (res.status === 401) return;
+            note = await res.json();
             const div = document.getElementById('notedisplay');
             div.innerHTML = '';
             div.style.display = 'block';
@@ -150,13 +153,11 @@
                 const index = notes.findIndex(note => note.id === id);
                 if (index !== -1) {
                     notes[index].title = title;
-                    notes[index].content = content;
                 } else {
-                    notes.push({ id, title, content });
+                    notes.push({ id, title});
                 };
                 renderNotes();
-                const note = notes.find(n => n.id === id);
-                displaynote(note);
+                renderNote(id);
             };
         };
 
@@ -217,7 +218,7 @@
             const id = window.location.hash.slice(1);
             if (!id) return;
             const note = notes.find(note => note.id === id);
-            if (note) displaynote(note);
+            if (note) renderNote(id);
         };
     </script>
 </body>
