@@ -2,11 +2,10 @@ export async function onRequestGet(context) {
     if (!checkAuth(context.request, context.env)) {
         return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": "Basic" } });
     }
-    
+
     const { request, env } = context;
     const url = new URL(request.url);
-
-    const key = url.pathname.replace(/^\/api\/rr\/?/, "");
+    const key = url.searchParams.get("key");
     if (!key) {
         return new Response("Missing file name", { status: 400 });
     }
