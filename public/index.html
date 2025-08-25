@@ -97,7 +97,7 @@
             notedisplayBOX.appendChild(mddiv)
         }
         function editornote(note) {
-            if (!note) note = { "id": "", "title": "", "content": "" };
+            if (!note) note = { "id": Date.now().toString(), "title": "", "content": "" };
             noteditorBOX.innerHTML = '';
             noteditorBOX.style.display = 'flex';
             const title = document.createElement("div");
@@ -149,12 +149,12 @@
             div.appendChild(mddiv);
             document.body.appendChild(div);
         }
-      
+
         async function saveNotes(id1) {
-            const id = id1 || Date.now().toString();
+            const id = id1
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
-            if (!title || !content) return;
+            if (!id || !title || !content) return;
             loader.style.display = 'block';
             try {
                 const response = await fetch("/api/notes", {
@@ -170,6 +170,7 @@
                     } else {
                         notes.push({ id, title });
                     };
+                    window.location.hash = id;
                     renderNotes();
                     return true;
                 } else {
