@@ -5,8 +5,8 @@ export async function onRequestGet(context) {
     return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": "Basic" } });
   }
 
-  const url = new URL(context.request.url);
-  const key = url.searchParams.get("key");
+  let key = context.params.notes;
+  if (Array.isArray(key)) key = key.join("/");
 
   if (!key) return new Response("Bad Request", { status: 400 });
 

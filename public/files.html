@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件</title>
+    <link rel="stylesheet" href="../css/loader.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .upload-area {
+            background: #f8f9fa;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #4299e1;
+            background: #edf2f7;
+        }
+
+        .upload-area.dragover {
+            border-color: #4299e1;
+            background: #e6fffa;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #4a5568;
+            font-size: 18px;
+        }
+
+        .upload-hint {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .files-section {
+            background: white;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .files-grid {
+            width: 100%;
+        }
+
+        .file {
+            display: flex;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            padding: 1px 5px;
+        }
+
+        .file:nth-child(1) {
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .file:hover {
+            background: #0073ff20;
+        }
+
+        .file p {
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #718096;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4299e1;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .upload-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .copyfile {
+            width: 100vw;
+            height: 100dvh;
+            /* background-color: #4299e136; */
+            position: absolute;
+            top: 0;
+            top: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .copyfilebox {
+            min-width: 320px;
+            border-radius: 10px;
+            background: #fafafa;
+            padding: 8px 10px 15px 15px;
+            color: #000;
+            line-height: 2;
+            font-size: 14px;
+            box-shadow: 0 1px 5px #00000080;
+        }
+
+        .title22 {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .title22 a {
+            margin-right: auto;
+        }
+
+        .title22 button {
+            background: #a2cdff;
+            border: 1px solid #bbb;
+            color: #000;
+            width: 36px;
+            height: 22px;
+            border-radius: 5px;
+        }
+
+        .title22 button:hover {
+            background: #53a3ff;
+        }
+
+        @media screen and (max-width: 500px) {
+            .main-content {
+                padding: 5px;
+            }
+
+            .files-section {
+                padding: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-text">点击或拖拽上传文件</div>
+                <input type="file" id="fileInput" class="file-input" multiple>
+
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="upload-status" id="uploadStatus"></div>
+            </div>
+
+            <div class="files-section">
+                <div class="files-grid" id="filesList">
+                    <div class="empty-state">加载中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="copyfile" id="copyfile"></div>
+    <div class="loader" id="loader"></div>
+    <script>
+        const loader = document.getElementById('loader');
+        const copyfile = document.getElementById('copyfile');
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'K', 'M', 'G'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(0)) + sizes[i];
+        }
+
+        // 上传文件
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const uploadStatus = document.getElementById('uploadStatus');
+
+            progressBar.style.display = 'block';
+            uploadStatus.style.display = 'none';
+
+            const xhr = new XMLHttpRequest();
+
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    progressFill.style.width = percentComplete + '%';
+                }
+            });
+
+            xhr.addEventListener('load', () => {
+                progressBar.style.display = 'none';
+                uploadStatus.style.display = 'block';
+
+                if (xhr.status === 200) {
+                    // const response = JSON.parse(xhr.responseText);
+                    uploadStatus.className = 'upload-status status-success';
+                    uploadStatus.textContent = '✅ 上传成功';
+                    refreshFiles();
+                } else {
+                    // const error = JSON.parse(xhr.responseText);
+                    uploadStatus.className = 'upload-status status-error';
+                    uploadStatus.textContent = '❌ 上传失败';
+                }
+
+                setTimeout(() => {
+                    uploadStatus.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 1000);
+            });
+
+            xhr.addEventListener('error', () => {
+                progressBar.style.display = 'none';
+                uploadStatus.style.display = 'block';
+                uploadStatus.className = 'upload-status status-error';
+                uploadStatus.textContent = '❌ 网络错误，上传失败';
+
+                setTimeout(() => {
+                    uploadStatus.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 3000);
+            });
+
+            xhr.open('POST', '/rr');
+            xhr.send(formData);
+        }
+
+        // 刷新文件列表
+        async function refreshFiles() {
+            let files = [];
+            const filesList = document.getElementById('filesList');
+            filesList.innerHTML = '';
+            copyfile.style.display = 'none';
+            try {
+                loader.style.display = 'block';
+                // const res = await fetch('../rr.json');
+                const res = await fetch('/rr/files');
+                files = await res.json();
+            } catch (err) {
+                files = { name: `加载失败，网络错误：${err.message}` };
+            } finally {
+                loader.style.display = 'none';
+            };
+
+            files.forEach((file) => {
+                const div = document.createElement("div");
+                div.className = "file";
+                const p = document.createElement("p");
+                p.innerText = file.name;
+                const size = document.createElement("span");
+                size.innerText = formatFileSize(file.size);
+                div.addEventListener('click', () => { copyfilebox(file.name) });
+                div.appendChild(p);
+                div.appendChild(size);
+                filesList.appendChild(div);
+            });
+
+        }
+
+        function copyfilebox(name) {
+            if (!name) return;
+            copyfile.innerHTML = '';
+            copyfile.style.display = 'flex';
+            const box = document.createElement("div");
+            box.classList.add('copyfilebox');
+            const title = document.createElement("div");
+            title.classList.add('title22');
+            const a = document.createElement("a");
+            a.innerText = name;
+            a.href = '/rr/' + name;
+            a.target = '_blank';
+            const clsbtn = document.createElement("button");
+            clsbtn.innerText = '关闭';
+            clsbtn.addEventListener('click', () => { copyfile.style.display = 'none' });
+            const delbtn = document.createElement("button");
+            delbtn.innerText = '删除';
+            delbtn.addEventListener('click', () => { deletefile(name) });
+            const text = document.createElement("div");
+            text.innerText = `路径：/rr/${name}
+                                HTML标签：<a href="/rr/${name}">${name}</a>
+                                HTML标签：<img src="/rr/${name}" alt="">
+                                md图片标签：![](/rr/${name})
+                                md链接标签：[${name}](/rr/${name})  
+            `;
+            title.appendChild(a);
+            title.appendChild(delbtn);
+            title.appendChild(clsbtn);
+            box.appendChild(title);
+            box.appendChild(text);
+            copyfile.appendChild(box);
+        }
+        // 删除文件
+        async function deletefile(filename) {
+            const userConfirmed = confirm('删除文件' + filename);
+            if (!userConfirmed) { return }
+            try {
+                loader.style.display = 'block';
+                const res = await fetch("/rr", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ filename })
+                });
+
+                if (res.ok) {
+                    await refreshFiles();
+                } else {
+                    console.error(filename, "删除失败，错误代码:", res.status);
+                    alert(filename + "删除失败，错误代码: " + res.status);
+                }
+            } catch (err) {
+                console.error("请求出错:", err);
+                alert("网络错误，删除失败");
+            } finally {
+                loader.style.display = 'none';
+            };
+        };
+        function copytext(name, type) {
+
+            let text = '/rr/' + name;
+            if (type === 'img') {
+                text = `<img src="/rr/${name}" alt="">`
+            } else if (type === 'md') {
+                text = `![](/rr/${name})`
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                console.log("复制", text);
+            });
+        }
+
+        // 初始化事件监听
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.querySelector('.upload-area');
+
+            // 文件选择事件
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(uploadFile);
+                fileInput.value = ''; // 清空输入框
+            });
+
+            // 拖拽上传
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                const files = Array.from(e.dataTransfer.files);
+                files.forEach(uploadFile);
+            });
+
+            // 初始加载文件列表
+            refreshFiles();
+        });
+    </script>
+</body>
+
+</html>

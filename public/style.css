@@ -39,14 +39,14 @@ body {
 }
 
 #app button {
-    display: block;
+    /* display: block; */
     padding: 3px 0;
     margin-left: 2px;
     margin-bottom: 5px;
     font-size: 17px;
     border: none;
     color: #004dba;
-    background: linear-gradient(to right, #886800, #7e0019) no-repeat;
+    background: linear-gradient(to right, #93e9ff, #ff55ff) no-repeat;
     background-size: 0 2px;
     background-position: center bottom;
     transition: all 0.3s ease;

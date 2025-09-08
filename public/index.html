@@ -14,6 +14,7 @@
 
     <div id="app">
         <button onclick="editornote()">AddNote</button>
+        <button onclick="window.open('files.html', '_blank')">AddFile</button>
         <div id="notes"></div>
     </div>
     <div id="notedisplay" class="notedisplay"></div>
@@ -29,7 +30,7 @@
             try {
                 loader.style.display = 'block';
                 // const res = await fetch("1.json");  // test
-                const res = await fetch("/api/notes?key=AllNotes");
+                const res = await fetch("/notes/AllNotes");
                 if (res.status === 401) return;
                 notes = await res.json();
                 document.getElementById("app").style.display = "block";
@@ -62,7 +63,7 @@
             notedisplayBOX.innerHTML = '';
             notedisplayBOX.style.display = 'block';
             try {
-                const res = await fetch(`/api/notes?key=note:${id}`);
+                const res = await fetch(`/notes/note:${id}`);
                 if (res.ok) {
                     note = await res.json();
                 } else {
@@ -157,7 +158,7 @@
             if (!id || !title || !content) return;
             loader.style.display = 'block';
             try {
-                const response = await fetch("/api/notes", {
+                const response = await fetch("/notes", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id, title, content })
@@ -193,7 +194,7 @@
             if (!id) return;
             loader.style.display = 'block';
             try {
-                const response = await fetch("/api/notes", {
+                const response = await fetch("/notes", {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id })
