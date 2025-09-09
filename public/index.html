@@ -153,8 +153,7 @@
             document.body.appendChild(div);
         }
 
-        async function saveNotes(id1) {
-            const id = id1
+        async function saveNotes(id) {
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
             if (!id || !title || !content) return;
