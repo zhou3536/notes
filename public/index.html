@@ -65,7 +65,7 @@
             notedisplayBOX.innerHTML = '';
             notedisplayBOX.style.display = 'block';
             try {
-                const res = await fetch(`/notes/note:${id}`);
+                const res = await fetch(`/notes/note_${id}`);
                 if (res.ok) {
                     note = await res.json();
                 } else {

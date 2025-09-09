@@ -34,7 +34,7 @@ export async function onRequestPost(context) {
   if (!body.title) return new Response("Missing title", { status: 400 });
   if (!body.content) return new Response("Missing content", { status: 400 });
 
-  await context.env.NOTES_KV.put(`note:${body.id}`, JSON.stringify(body));
+  await context.env.NOTES_KV.put(`note_${body.id}`, JSON.stringify(body));
   await UpdateList(context.env, 'push', body);
   return new Response("OK", { status: 200 });
 }
@@ -50,7 +50,7 @@ export async function onRequestDelete(context) {
     return new Response("Missing id", { status: 400 });
   }
 
-  await context.env.NOTES_KV.delete(`note:${body.id}`);
+  await context.env.NOTES_KV.delete(`note_${body.id}`);
   await UpdateList(context.env, 'delete', body);
   return new Response("OK", { status: 200 });
 }
@@ -61,7 +61,7 @@ async function ReloadList(env) {
 
   do {
     const listResult = await env.NOTES_KV.list({
-      prefix: "note:",
+      prefix: "note_",
       cursor
     });
     cursor = listResult.cursor;
