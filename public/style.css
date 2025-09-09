@@ -52,23 +52,25 @@ body {
     transition: all 0.3s ease;
 }
 
+#app button:hover {
+    background-size: 100%;
+    background-position: center bottom;
+}
 
 .note {
     cursor: default;
-    padding: 5px 0;
+    padding: 3px 8px;
     margin: 5px 0;
-    /* border-radius: 10px; */
+    border-radius: 8px;
     width: fit-content;
-    background: linear-gradient(to right, #006b95, #99009c) no-repeat;
     background-size: 0 2px;
     background-position: center bottom;
     transition: all 0.3s ease;
+    background: #0059ff10;
 }
 
-#app button:hover,
 .note:hover {
-    background-size: calc(100% - 4px) 2px;
-    background-position: center bottom;
+    background: #0059ff20;
 }
 
 .noteditor,
@@ -143,4 +145,3 @@ body {
     border-radius: 6px;
     width: 100%;
 }
-

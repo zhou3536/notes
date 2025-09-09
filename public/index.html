@@ -69,10 +69,10 @@
                 if (res.ok) {
                     note = await res.json();
                 } else {
-                    note = { id, title: "加载失败", content: `加载失败，错误代码${res.status}` };
+                    note = { id, title: "加载失败", content: `错误代码${res.status}` };
                 }
             } catch (err) {
-                note = { id, title: "加载失败", content: `加载失败，网络错误：${err.message}` };
+                note = { id, title: "加载失败", content: `网络错误：${err.message}` };
             } finally {
                 loader.style.display = 'none';
             }
@@ -227,7 +227,7 @@
             } catch (error) {
                 alert("更新失败！请检查您的网络连接。");
             } finally {
-                loader.style.display = 'block';
+                loader.style.display = 'none';
             };
         };
         function HashChange() {
