@@ -212,6 +212,7 @@
         async function ReloadList() {
             const userConfirmed = confirm('如果更新了内容，列表刷新不出来，可以尝试重载列表');
             if (!userConfirmed) return;
+            loader.style.display = 'block';
             try {
                 const response = await fetch("/notes", {
                     method: "POST",
@@ -225,6 +226,8 @@
                 }
             } catch (error) {
                 alert("更新失败！请检查您的网络连接。");
+            } finally {
+                loader.style.display = 'block';
             };
         };
         function HashChange() {
