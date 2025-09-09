@@ -26,8 +26,8 @@ export async function onRequestPost(context) {
   }
 
   const body = await context.request.json();
-  if (body === 'ReloadList') {
-    ReloadList(context.env);
+  if (body.action === 'ReloadList') {
+    await ReloadList(context.env);
     return new Response("OK", { status: 200 });
   }
   if (!body.id) return new Response("Missing id", { status: 400 });
