@@ -39,10 +39,9 @@ body {
 }
 
 #app button {
-    /* display: block; */
-    padding: 3px 0;
-    margin-left: 2px;
-    margin-bottom: 5px;
+    padding: 2px 0;
+    margin: 5px;
+    margin-left: 0;
     font-size: 17px;
     border: none;
     color: #004dba;
@@ -53,18 +52,16 @@ body {
 }
 
 #app button:hover {
-    background-size: 100%;
+    background-size: 100% 2px;
     background-position: center bottom;
 }
 
 .note {
     cursor: default;
-    padding: 3px 8px;
+    padding: 3px 5px;
     margin: 5px 0;
     border-radius: 8px;
     width: fit-content;
-    background-size: 0 2px;
-    background-position: center bottom;
     transition: all 0.3s ease;
     background: #0059ff10;
 }
