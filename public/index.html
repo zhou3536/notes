@@ -16,6 +16,7 @@
     <div id="app">
         <button onclick="editornote()">AddNote</button>
         <button onclick="window.open('files.html', '_blank')">AddFile</button>
+        <button onclick="ReloadList()">ReloadList</button>
         <div id="notes"></div>
     </div>
     <div id="notedisplay" class="notedisplay"></div>
@@ -32,7 +33,7 @@
                 loader.style.display = 'block';
                 // const res = await fetch("1.json");  // test
                 const res = await fetch("/notes/AllNotes");
-                if (res.status === 401) return;
+                if (!res.ok) return;
                 notes = await res.json();
                 document.getElementById("app").style.display = "block";
                 renderNotes();
@@ -166,14 +167,8 @@
                 });
 
                 if (response.ok) {
-                    const index = notes.findIndex(note => note.id === id);
-                    if (index !== -1) {
-                        notes[index].title = title;
-                    } else {
-                        notes.push({ id, title });
-                    };
                     window.location.hash = id;
-                    renderNotes();
+                    login();
                     return true;
                 } else {
                     console.error(`Save failed with status ${response.status}:`);
@@ -201,8 +196,7 @@
                     body: JSON.stringify({ id })
                 });
                 if (response.ok) {
-                    notes = notes.filter(note => note.id !== id);
-                    renderNotes();
+                    login();
                 } else {
                     console.error(`Delete failed with status ${response.status}:`);
                     alert(`删除失败：${response.status}`);
@@ -215,7 +209,22 @@
                 loader.style.display = 'none';
             }
         };
-
+        async function ReloadList() {
+            try {
+                const response = await fetch("/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "ReloadList" })
+                });
+                if (response.ok) {
+                    login();
+                } else {
+                    alert(`更新失败：${response.status}`);
+                }
+            } catch (error) {
+                alert("更新失败！请检查您的网络连接。");
+            };
+        };
         function HashChange() {
             const id = window.location.hash.slice(1);
             if (!id) return;

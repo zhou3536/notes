@@ -16,7 +16,7 @@ export async function onRequestGet(context) {
 
   return new Response(JSON.stringify(value), {
     status: 200,
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
   });
 }
 
@@ -26,10 +26,14 @@ export async function onRequestPost(context) {
   }
 
   const body = await context.request.json();
+  if (body === 'ReloadList') {
+    ReloadList(context.env);
+    return new Response("OK", { status: 200 });
+  }
   if (!body.id) return new Response("Missing id", { status: 400 });
 
   await context.env.NOTES_KV.put(`note:${body.id}`, JSON.stringify(body));
-  await UpdateList(context.env);
+  await UpdateList(context.env, 'push', body);
   return new Response("OK", { status: 200 });
 }
 
@@ -45,11 +49,11 @@ export async function onRequestDelete(context) {
   }
 
   await context.env.NOTES_KV.delete(`note:${body.id}`);
-  await UpdateList(context.env);
+  await UpdateList(context.env, 'delete', body);
   return new Response("OK", { status: 200 });
 }
 
-async function UpdateList(env) {
+async function ReloadList(env) {
   let cursor = null;
   let allNotes = [];
 
@@ -69,4 +73,30 @@ async function UpdateList(env) {
   } while (cursor);
 
   await env.NOTES_KV.put("AllNotes", JSON.stringify(allNotes));
+}
+
+async function UpdateList(env, type, body) {
+  const key = "AllNotes";
+  let listStr = await env.NOTES_KV.get(key);
+  let list = [];
+  if (listStr) {
+    try {
+      list = JSON.parse(listStr);
+    } catch (e) {
+      list = [];
+    }
+  }
+
+  if (type === 'push') {
+    const index = list.findIndex(item => item.id === body.id);
+    if (index >= 0) {
+      list[index].title = body.title;
+    } else {
+      list.push({ id: body.id, title: body.title });
+    }
+  } else if (type === 'delete') {
+    list = list.filter(item => item.id !== body.id);
+  }
+
+  await env.NOTES_KV.put(key, JSON.stringify(list));
 }
