@@ -31,6 +31,8 @@ export async function onRequestPost(context) {
     return new Response("OK", { status: 200 });
   }
   if (!body.id) return new Response("Missing id", { status: 400 });
+  if (!body.title) return new Response("Missing title", { status: 400 });
+  if (!body.content) return new Response("Missing content", { status: 400 });
 
   await context.env.NOTES_KV.put(`note:${body.id}`, JSON.stringify(body));
   await UpdateList(context.env, 'push', body);
