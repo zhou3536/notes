@@ -24,10 +24,12 @@
     <div class="loader" id="loader"></div>
     <script>
         let notes = [];
+        const app = document.getElementById("app");
         const loader = document.getElementById('loader');
         const noteditorBOX = document.getElementById('noteditor');
         const notedisplayBOX = document.getElementById('notedisplay');
         const container = document.getElementById("notes");
+
         async function login() {
             try {
                 loader.style.display = 'block';
@@ -35,7 +37,7 @@
                 const res = await fetch("/notes/AllNotes");
                 if (!res.ok) return;
                 notes = await res.json();
-                document.getElementById("app").style.display = "block";
+                app.style.display = "block";
                 renderNotes();
             } finally {
                 loader.style.display = 'none';
@@ -98,7 +100,8 @@
             mddiv.innerHTML = marked.parse(note.content);
             notedisplayBOX.appendChild(title)
             notedisplayBOX.appendChild(mddiv)
-        }
+        };
+
         function editornote(note) {
             if (!note) note = { "id": Date.now().toString(), "title": "", "content": "" };
             noteditorBOX.innerHTML = '';
@@ -128,7 +131,8 @@
             textarea.value = note.content;
             noteditorBOX.appendChild(title)
             noteditorBOX.appendChild(textarea)
-        }
+        };
+
         function previewnote() {
             const titletext = document.getElementById('notetitle').value;
             const contentext = document.getElementById('notecontent').value;
@@ -151,7 +155,7 @@
             div.appendChild(title);
             div.appendChild(mddiv);
             document.body.appendChild(div);
-        }
+        };
 
         async function saveNotes(id) {
             const title = document.getElementById('notetitle').value;
@@ -208,6 +212,7 @@
                 loader.style.display = 'none';
             }
         };
+
         async function ReloadList() {
             const userConfirmed = confirm('如果更新了内容，列表刷新不出来，可以尝试重载列表');
             if (!userConfirmed) return;
@@ -229,12 +234,14 @@
                 loader.style.display = 'none';
             };
         };
+
         function HashChange() {
             const id = window.location.hash.slice(1);
             if (!id) return;
             const note = notes.find(note => note.id === id);
             if (note) renderNote(id);
         };
+        
     </script>
 </body>
 
