@@ -126,20 +126,24 @@ body {
     background-color: #b9d9ff;
 }
 
-.noteditor .title input,
+.noteditor input,
 .noteditor textarea {
     padding: 6px 10px;
     outline: none;
     border: 2px solid #002a4550;
     border-radius: 5px;
     margin: 0 5px;
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
 }
 
 .noteditor textarea {
     resize: none;
     flex: 1;
-    font-family: sans-serif;
     padding: 10px;
     border-radius: 6px;
-    /* width: 100%; */
+}
+
+.noteditor input:focus,
+.noteditor textarea:focus {
+    border: 2px solid #002a45a0;
 }
