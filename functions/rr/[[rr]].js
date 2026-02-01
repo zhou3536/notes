@@ -6,36 +6,54 @@ export async function onRequestGet(context) {
     }
     const { env } = context;
     let key = context.params.rr;
-    if (Array.isArray(key)) key = key.join("/");
 
     if (!key) {
         return new Response("Bad Request", { status: 400 });
-    } else if (key === 'files') {
+    }
+
+    if (Array.isArray(key)) key = key.join("/");
+
+    if (key === "files") {
         try {
             const objects = await env.RR_BUCKET.list();
-            const Files = objects.objects.map(obj => ({ name: obj.key, size: obj.size }));
+            const Files = objects.objects.map(obj => ({
+                name: obj.key,
+                size: obj.size
+            }));
 
             return new Response(JSON.stringify(Files, null, 2), {
-                headers: { 'Content-Type': 'application/json', "Cache-Control": "no-store" }
-            });
-        } catch (err) {
-            return new Response("Error: " + err.message, { status: 500 });
-        };
-    } else {
-        try {
-            const object = await env.RR_BUCKET.get(key);
-            if (!object) {
-                return new Response("Not Found", { status: 404 });
-            }
-
-            return new Response(object.body, {
-                headers: { "Cache-Control": "public, max-age=86400" }
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store"
+                }
             });
         } catch (err) {
             return new Response("Error: " + err.message, { status: 500 });
         }
     }
+
+    key = decodeURIComponent(key);
+
+    try {
+        const object = await env.RR_BUCKET.get(key);
+
+        if (!object) {
+            return new Response("Not Found", { status: 404 });
+        }
+
+        return new Response(object.body, {
+            headers: {
+                "Content-Type": object.httpMetadata?.contentType || "application/octet-stream",
+                "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(key)}`,
+                "Cache-Control": "public, max-age=86400"
+            }
+        });
+
+    } catch (err) {
+        return new Response("Error: " + err.message, { status: 500 });
+    }
 };
+
 
 
 export async function onRequestPost(context) {
