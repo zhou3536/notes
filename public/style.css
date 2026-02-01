@@ -39,10 +39,11 @@ body {
 }
 
 #app button {
-    padding: 2px 0;
+    padding: 3px 0;
     margin: 5px;
     margin-left: 0;
     font-size: 17px;
+    font-weight: 700;
     border: none;
     color: #004dba;
     background: linear-gradient(to right, #93e9ff, #ff55ff) no-repeat;
