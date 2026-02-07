@@ -175,9 +175,12 @@
                 });
 
                 if (response.ok) {
-                    window.location.hash = id;
+                    if (window.location.hash.length <= 1) {
+                        window.location.hash = id;
+                    } else {
+                        renderNote();
+                    }
                     getNotesList();
-                    renderNote();
                     return true;
                 } else {
                     console.error(`Save failed with status ${response.status}:`);
@@ -242,9 +245,6 @@
                 loader.style.display = 'none';
             };
         };
-
-       
-
     </script>
 </body>
 
