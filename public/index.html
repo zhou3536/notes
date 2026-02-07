@@ -22,7 +22,9 @@
     <div id="notedisplay" class="notedisplay"></div>
     <div id="noteditor" class="noteditor"></div>
     <!-- <div class="loader" id="loader"></div> -->
-    <svg class="loader" id="loader" viewBox="25 25 50 50"> <circle r="20" cy="50" cx="50"></circle></svg>
+    <svg class="loader" id="loader" viewBox="25 25 50 50">
+        <circle r="20" cy="50" cx="50"></circle>
+    </svg>
     <script>
         let notes = [];
         const app = document.getElementById("app");
@@ -31,7 +33,7 @@
         const notedisplayBOX = document.getElementById('notedisplay');
         const container = document.getElementById("notes");
 
-        async function login() {
+        async function getNotesList() {
             try {
                 loader.style.display = 'block';
                 // const res = await fetch("1.json");  // test
@@ -44,26 +46,28 @@
                 loader.style.display = 'none';
             }
         }
-        login();
+        getNotesList();
 
         function renderNotes() {
-            noteditorBOX.style.display = 'none';
-            notedisplayBOX.style.display = 'none';
             container.style.display = 'block';
             container.innerHTML = "";
             notes.forEach((note, index) => {
-                const div = document.createElement("div");
+                const div = document.createElement("a");
                 div.className = "note";
-                div.addEventListener('click', () => { renderNote(note.id) });
+                div.href = '#' + note.id;
                 div.innerText = `${index + 1}. ${note.title}`;
                 container.appendChild(div);
             });
-            HashChange();
         };
-
-        async function renderNote(id) {
-            if (!id) return;
-            window.location.hash = id;
+        window.addEventListener('load', renderNote)
+        window.addEventListener('hashchange', renderNote);
+        async function renderNote() {
+            noteditorBOX.style.display = 'none';
+            const id = window.location.hash.substring(1);
+            if (!id) {
+                notedisplayBOX.style.display = 'none';
+                return;
+            };
             loader.style.display = 'block';
             notedisplayBOX.innerHTML = '';
             notedisplayBOX.style.display = 'block';
@@ -91,7 +95,7 @@
             delbtn.addEventListener('click', () => { deleteNote(note.id) });
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '关闭';
-            clsbtn.addEventListener('click', () => { notedisplayBOX.style.display = 'none'; window.location.hash = "" });
+            clsbtn.addEventListener('click', () => { window.location.hash = "" });
             title.appendChild(h3);
             title.appendChild(edtbtn);
             title.appendChild(delbtn);
@@ -172,7 +176,8 @@
 
                 if (response.ok) {
                     window.location.hash = id;
-                    login();
+                    getNotesList();
+                    renderNote();
                     return true;
                 } else {
                     console.error(`Save failed with status ${response.status}:`);
@@ -200,7 +205,8 @@
                     body: JSON.stringify({ id })
                 });
                 if (response.ok) {
-                    login();
+                    window.location.hash = '';
+                    getNotesList();
                 } else {
                     console.error(`Delete failed with status ${response.status}:`);
                     alert(`删除失败：${response.status}`);
@@ -225,7 +231,8 @@
                     body: JSON.stringify({ action: "ReloadList" })
                 });
                 if (response.ok) {
-                    login();
+                    window.location.hash = '';
+                    getNotesList();
                 } else {
                     alert(`更新失败：${response.status}`);
                 }
@@ -236,13 +243,8 @@
             };
         };
 
-        function HashChange() {
-            const id = window.location.hash.slice(1);
-            if (!id) return;
-            const note = notes.find(note => note.id === id);
-            if (note) renderNote(id);
-        };
-        
+       
+
     </script>
 </body>
 
