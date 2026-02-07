@@ -60,6 +60,7 @@ body {
 .note {
     display: block;
     text-decoration: none;
+    color: #000;
     cursor: default;
     padding: 3px 5px;
     margin: 5px 0;
@@ -71,6 +72,7 @@ body {
 
 .note:hover {
     background: #0059ff20;
+    color: #0059ff;
 }
 
 .noteditor,
