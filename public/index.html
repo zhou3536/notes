@@ -76,10 +76,10 @@
                 if (res.ok) {
                     note = await res.json();
                 } else {
-                    note = { id, title: "加载失败", content: `错误代码${res.status}` };
+                    note = { title: "加载失败", content: `错误代码${res.status}` };
                 }
             } catch (err) {
-                note = { id, title: "加载失败", content: `网络错误：${err.message}` };
+                note = { title: "加载失败", content: `网络错误：${err.message}` };
             } finally {
                 loader.style.display = 'none';
             }
@@ -97,8 +97,10 @@
             clsbtn.innerText = '关闭';
             clsbtn.addEventListener('click', () => { window.location.hash = "" });
             title.appendChild(h3);
-            title.appendChild(edtbtn);
-            title.appendChild(delbtn);
+            if (note.id) {
+                title.appendChild(edtbtn);
+                title.appendChild(delbtn);
+            }
             title.appendChild(clsbtn);
             const mddiv = document.createElement("div");
             mddiv.classList.add('markdown-body');
