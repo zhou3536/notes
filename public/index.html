@@ -127,7 +127,7 @@
             clsbtn.addEventListener('click', () => { noteditorBOX.style.display = 'none' });
             const prvbtn = document.createElement("button");
             prvbtn.innerText = '预览';
-            prvbtn.addEventListener('click', () => { previewnote() });
+            prvbtn.addEventListener('click', () => { previewnote(note) });
             title.appendChild(input);
             title.appendChild(prvbtn);
             title.appendChild(sumbtn);
@@ -140,7 +140,7 @@
             noteditorBOX.appendChild(textarea)
         };
 
-        function previewnote() {
+        function previewnote(note) {
             const titletext = document.getElementById('notetitle').value;
             const contentext = document.getElementById('notecontent').value;
             if (!contentext) return;
@@ -152,9 +152,13 @@
             const h3 = document.createElement("h3");
             h3.innerText = titletext;
             const clsbtn = document.createElement("button");
-            clsbtn.innerText = '关闭';
+            clsbtn.innerText = '返回';
             clsbtn.addEventListener('click', () => { div.remove() });
+            const sumbtn = document.createElement("button");
+            sumbtn.innerText = '提交';
+            sumbtn.addEventListener('click', () => { saveNotes(note.id) });
             title.appendChild(h3);
+            title.appendChild(sumbtn);
             title.appendChild(clsbtn);
             const mddiv = document.createElement("div");
             mddiv.classList.add('markdown-body');
