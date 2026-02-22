@@ -156,7 +156,7 @@
             clsbtn.addEventListener('click', () => { div.remove() });
             const sumbtn = document.createElement("button");
             sumbtn.innerText = '提交';
-            sumbtn.addEventListener('click', () => { saveNotes(note.id) });
+            sumbtn.addEventListener('click', () => { div.remove(); saveNotes(note.id) });
             title.appendChild(h3);
             title.appendChild(sumbtn);
             title.appendChild(clsbtn);
