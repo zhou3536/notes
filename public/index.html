@@ -94,7 +94,7 @@
             delbtn.innerText = '删除';
             delbtn.addEventListener('click', () => { deleteNote(note.id) });
             const clsbtn = document.createElement("button");
-            clsbtn.innerText = '关闭';
+            clsbtn.innerText = '返回';
             clsbtn.addEventListener('click', () => { window.location.hash = "" });
             title.appendChild(h3);
             if (note.id) {
@@ -120,10 +120,10 @@
             input.id = 'notetitle';
             input.value = note.title;
             const sumbtn = document.createElement("button");
-            sumbtn.innerText = '提交';
+            sumbtn.innerText = '保存';
             sumbtn.addEventListener('click', () => { saveNotes(note.id) });
             const clsbtn = document.createElement("button");
-            clsbtn.innerText = '关闭';
+            clsbtn.innerText = '取消';
             clsbtn.addEventListener('click', () => { noteditorBOX.style.display = 'none' });
             const prvbtn = document.createElement("button");
             prvbtn.innerText = '预览';
@@ -155,7 +155,7 @@
             clsbtn.innerText = '返回';
             clsbtn.addEventListener('click', () => { div.remove() });
             const sumbtn = document.createElement("button");
-            sumbtn.innerText = '提交';
+            sumbtn.innerText = '保存';
             sumbtn.addEventListener('click', () => { div.remove(); saveNotes(note.id) });
             title.appendChild(h3);
             title.appendChild(sumbtn);
