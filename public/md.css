@@ -5,12 +5,13 @@
 }
 
 .markdown-body {
-    box-shadow: 0 1px 5px #eee;
+    /* box-shadow: 0 1px 5px #eee; */
     box-sizing: border-box;
     min-width: 320px;
     width: 100%;
     padding: 8px;
     background: #fff;
+    border-top: 1px solid #00000020;
 }
 
 @media screen and (max-width: 500px) {
