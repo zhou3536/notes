@@ -6,6 +6,7 @@
 
 body {
     font-family: sans-serif;
+    background: #eff6fa;
 }
 
 @keyframes fadeIn1 {
@@ -35,6 +36,7 @@ body {
     height: 100dvh;
     max-width: 1000px;
     margin: 0 auto;
+    background: #ffffff;
     animation: fadeIn1 0.3s ease-in-out;
 }
 
@@ -133,7 +135,6 @@ body {
 
 .noteditor input,
 .noteditor textarea {
-    padding: 6px 10px;
     outline: none;
     border: 2px solid #002a4550;
     border-radius: 5px;
@@ -141,14 +142,18 @@ body {
     font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
 }
 
+.noteditor input {
+    padding: 3px 6px;
+}
+
 .noteditor textarea {
     resize: none;
     flex: 1;
-    padding: 10px;
+    padding: 6px;
     border-radius: 6px;
 }
 
 .noteditor input:focus,
 .noteditor textarea:focus {
-    border: 2px solid #002a45a0;
+    border: 2px solid #4ba2ea;
 }
