@@ -37,8 +37,8 @@
         async function getNotesList() {
             try {
                 loader.style.display = 'block';
-                // const res = await fetch("1.json");  // test
-                const res = await fetch("/notes/AllNotes");
+                const res = await fetch("1.json");  // test
+                // const res = await fetch("/notes/AllNotes");
                 if (!res.ok) return;
                 notes = await res.json();
                 app.style.display = "block";
@@ -194,8 +194,9 @@
                 });
 
                 if (response.ok) {
+                    window.location.hash = id
                     isFormDirty = false;
-                    window.location.assign(window.location.pathname + '#' + id);
+                    window.location.reload();
                 } else {
                     console.error(`Save failed with status ${response.status}:`);
                     alert(`保存失败：${response.status}`);
