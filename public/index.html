@@ -37,7 +37,7 @@
         async function getNotesList() {
             try {
                 loader.style.display = 'block';
-                // const res = await fetch("1.json");  // test
+                // const res = await fetch("1.json");  // test11
                 const res = await fetch("/notes/AllNotes");
                 if (!res.ok) return;
                 notes = await res.json();
