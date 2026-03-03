@@ -5,6 +5,7 @@
     width: 2.5em;
     transform-origin: center;
     animation: rotate4 1.3s linear infinite;
+    z-index: 1000;
 }
 
 .loader circle {
