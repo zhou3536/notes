@@ -60,9 +60,10 @@
                 container.appendChild(div);
             });
         };
-        window.addEventListener('load', renderNote)
-        window.addEventListener('hashchange', renderNote);
-        async function renderNote() {
+        window.addEventListener('load', hashchange)
+        window.addEventListener('hashchange', hashchange);
+        async function hashchange() {
+            if (isFormDirty) return;
             noteditorBOX.style.display = 'none';
             const id = window.location.hash.substring(1);
             if (!id) {
@@ -183,7 +184,7 @@
         async function saveNotes(id) {
             const title = document.getElementById('notetitle').value;
             const content = document.getElementById('notecontent').value;
-            if (!id || !title || !content) {alert("请输入标题和内容");return};
+            if (!id || !title || !content) { alert("请输入标题和内容"); return };
             loader.style.display = 'block';
             try {
                 const response = await fetch("/notes", {
@@ -197,7 +198,7 @@
                     if (window.location.hash.length <= 1) {
                         window.location.hash = id;
                     } else {
-                        renderNote();
+                        hashchange();
                     }
                     getNotesList();
                     return true;
