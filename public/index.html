@@ -194,8 +194,9 @@
                 });
 
                 if (response.ok) {
+                    window.location.hash = id
                     isFormDirty = false;
-                    window.location.assign(window.location.pathname + '#' + id);
+                    window.location.reload();
                 } else {
                     console.error(`Save failed with status ${response.status}:`);
                     alert(`保存失败：${response.status}`);
