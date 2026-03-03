@@ -97,7 +97,7 @@
             delbtn.addEventListener('click', () => { deleteNote(note.id) });
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '返回';
-            clsbtn.addEventListener('click', () => { window.location.hash = "" });
+            clsbtn.addEventListener('click', () => { window.location.hash = ""; hashchange() });
             title.appendChild(h3);
             if (note.id) {
                 title.appendChild(edtbtn);
