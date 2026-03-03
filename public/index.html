@@ -195,7 +195,7 @@
 
                 if (response.ok) {
                     isFormDirty = false;
-                    window.location.href = location.origin + location.pathname + '#' + id;
+                    window.location.assign(window.location.pathname + '#' + id);
                 } else {
                     console.error(`Save failed with status ${response.status}:`);
                     alert(`保存失败：${response.status}`);
