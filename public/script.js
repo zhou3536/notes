@@ -1,0 +1,241 @@
+ let notes = [];
+        let isFormDirty = false;
+        const app = document.getElementById("app");
+        const loader = document.getElementById('loader');
+        const noteditorBOX = document.getElementById('noteditor');
+        const notedisplayBOX = document.getElementById('notedisplay');
+        const container = document.getElementById("notes");
+
+        async function getNotesList() {
+            try {
+                loader.style.display = 'block';
+                // const res = await fetch("1.json");  // test
+                const res = await fetch("/notes/AllNotes");
+                if (!res.ok) return;
+                notes = await res.json();
+                app.style.display = "block";
+                renderNotes();
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        getNotesList();
+
+        function renderNotes() {
+            container.style.display = 'block';
+            container.innerHTML = "";
+            notes.forEach((note, index) => {
+                const div = document.createElement("a");
+                div.className = "note";
+                div.href = '#' + note.id;
+                div.innerText = `${index + 1}. ${note.title}`;
+                container.appendChild(div);
+            });
+        };
+        window.addEventListener('load', hashchange)
+        window.addEventListener('hashchange', hashchange);
+        async function hashchange() {
+            if (isFormDirty) return;
+            noteditorBOX.style.display = 'none';
+            const id = window.location.hash.substring(1);
+            if (!id) {
+                notedisplayBOX.style.display = 'none';
+                return;
+            };
+            loader.style.display = 'block';
+            notedisplayBOX.innerHTML = '';
+            notedisplayBOX.style.display = 'block';
+            try {
+                const res = await fetch(`/notes/note_${id}`);
+                if (res.ok) {
+                    note = await res.json();
+                } else {
+                    note = { title: "加载失败", content: `错误代码${res.status}` };
+                }
+            } catch (err) {
+                note = { title: "加载失败", content: `网络错误：${err.message}` };
+            } finally {
+                loader.style.display = 'none';
+            }
+            const title = document.createElement("div");
+            title.classList.add('title')
+            const h3 = document.createElement("h3");
+            h3.innerText = note.title;
+            const edtbtn = document.createElement("button");
+            edtbtn.innerText = '编辑';
+            edtbtn.addEventListener('click', () => { editornote(note) });
+            const delbtn = document.createElement("button");
+            delbtn.innerText = '删除';
+            delbtn.addEventListener('click', () => { deleteNote(note.id) });
+            const clsbtn = document.createElement("button");
+            clsbtn.innerText = '返回';
+            clsbtn.addEventListener('click', () => { window.location.hash = ""; hashchange() });
+            title.appendChild(h3);
+            if (note.id) {
+                title.appendChild(edtbtn);
+                title.appendChild(delbtn);
+            }
+            title.appendChild(clsbtn);
+            const mddiv = document.createElement("div");
+            mddiv.classList.add('markdown-body');
+            mddiv.innerHTML = marked.parse(note.content);
+            notedisplayBOX.appendChild(title)
+            notedisplayBOX.appendChild(mddiv)
+        };
+
+        function editornote(note) {
+            isFormDirty = true;
+            if (!note) note = { "id": Date.now().toString(), "title": "", "content": "" };
+            noteditorBOX.innerHTML = '';
+            noteditorBOX.style.display = 'flex';
+            const title = document.createElement("div");
+            title.classList.add('title')
+            const input = document.createElement("input");
+            input.placeholder = "输入标题..."
+            input.id = 'notetitle';
+            input.value = note.title;
+            const sumbtn = document.createElement("button");
+            sumbtn.innerText = '保存';
+            sumbtn.addEventListener('click', () => { saveNotes(note.id) });
+            const clsbtn = document.createElement("button");
+            clsbtn.innerText = '取消';
+
+            const prvbtn = document.createElement("button");
+            prvbtn.innerText = '预览';
+            prvbtn.addEventListener('click', () => { previewnote(note) });
+            title.appendChild(input);
+            title.appendChild(prvbtn);
+            title.appendChild(sumbtn);
+            title.appendChild(clsbtn);
+            const textarea = document.createElement("textarea");
+            textarea.placeholder = "输入内容..."
+            textarea.id = 'notecontent';
+            textarea.value = note.content;
+            noteditorBOX.appendChild(title)
+            noteditorBOX.appendChild(textarea)
+            clsbtn.addEventListener('click', () => {
+                const titletext = document.getElementById('notetitle').value;
+                const contentext = document.getElementById('notecontent').value;
+                if (titletext !== note.title || contentext !== note.content) {
+                    const notSave = confirm('确定  放弃保存\n取消  继续编辑');
+                    if (!notSave) return;
+                }
+                isFormDirty = false;
+                noteditorBOX.style.display = 'none';
+            });
+        };
+
+        function previewnote(note) {
+            const titletext = document.getElementById('notetitle').value;
+            const contentext = document.getElementById('notecontent').value;
+            if (!contentext) { alert("请输入内容"); return };
+            const div = document.createElement("div");
+            div.classList.add('notedisplay');
+            div.style.display = 'block';
+            const title = document.createElement("div");
+            title.classList.add('title');
+            const h3 = document.createElement("h3");
+            h3.innerText = titletext;
+            const clsbtn = document.createElement("button");
+            clsbtn.innerText = '返回';
+            clsbtn.addEventListener('click', () => { div.remove() });
+            const sumbtn = document.createElement("button");
+            sumbtn.innerText = '保存';
+            sumbtn.addEventListener('click', () => { saveNotes(note.id) });
+            title.appendChild(h3);
+            title.appendChild(sumbtn);
+            title.appendChild(clsbtn);
+            const mddiv = document.createElement("div");
+            mddiv.classList.add('markdown-body');
+            mddiv.innerHTML = marked.parse(contentext);
+            div.appendChild(title);
+            div.appendChild(mddiv);
+            document.body.appendChild(div);
+        };
+
+        async function saveNotes(id) {
+            const title = document.getElementById('notetitle').value;
+            const content = document.getElementById('notecontent').value;
+            if (!id || !title || !content) { alert("请输入标题和内容"); return };
+            loader.style.display = 'block';
+            try {
+                const response = await fetch("/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id, title, content })
+                });
+
+                if (response.ok) {
+                    window.location.hash = id
+                    isFormDirty = false;
+                    window.location.reload();
+                } else {
+                    console.error(`Save failed with status ${response.status}:`);
+                    alert(`保存失败：${response.status}`);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Network or fetch error during save:", error);
+                alert("保存失败！请检查您的网络连接。");
+                return false;
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+
+        async function deleteNote(id) {
+            const userConfirmed = confirm('您确定要删除吗？');
+            if (!userConfirmed) return;
+            if (!id) return;
+            loader.style.display = 'block';
+            try {
+                const response = await fetch("/notes", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id })
+                });
+                if (response.ok) {
+                    window.location.hash = '';
+                    getNotesList();
+                } else {
+                    console.error(`Delete failed with status ${response.status}:`);
+                    alert(`删除失败：${response.status}`);
+                }
+            } catch (error) {
+                console.error("Network or fetch error during delete:", error);
+                alert("删除失败！请检查您的网络连接。");
+                notes = initialNotes;
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+
+        async function ReloadList() {
+            const userConfirmed = confirm('如果更新了内容，列表刷新不出来，可以尝试重载列表');
+            if (!userConfirmed) return;
+            loader.style.display = 'block';
+            try {
+                const response = await fetch("/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "ReloadList" })
+                });
+                if (response.ok) {
+                    window.location.hash = '';
+                    getNotesList();
+                } else {
+                    alert(`更新失败：${response.status}`);
+                }
+            } catch (error) {
+                alert("更新失败！请检查您的网络连接。");
+            } finally {
+                loader.style.display = 'none';
+            };
+        };
+
+        window.addEventListener('beforeunload', function (event) {
+            if (isFormDirty) {
+                event.preventDefault();
+                event.returnValue = '';
+            }
+        });
