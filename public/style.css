@@ -6,7 +6,39 @@
 
 body {
     font-family: sans-serif;
-    background: #eff6fa;
+    min-height: 100vh;
+
+    background-color: #f5e9d4;
+
+    background-image:
+        radial-gradient(ellipse at center,
+            #fff8e8 0%,
+            #f5e9d4 35%,
+            #e8d5b0 70%,
+            #d4b68a 100%),
+
+        radial-gradient(circle at 15% 15%,
+            transparent 30%,
+            rgba(180, 120, 60, 0.12) 60%,
+            rgba(140, 80, 30, 0.18) 85%,
+            rgba(100, 50, 10, 0.22) 100%),
+        radial-gradient(circle at 85% 12%,
+            transparent 25%,
+            rgba(160, 100, 40, 0.15) 55%,
+            rgba(120, 60, 20, 0.20) 80%),
+        radial-gradient(circle at 10% 88%,
+            transparent 35%,
+            rgba(170, 110, 50, 0.14) 65%),
+
+        /* 非常轻微的噪点层（模拟纸张纤维/颗粒） */
+        radial-gradient(circle,
+            rgba(0, 0, 0, 0.03) 1px,
+            transparent 1px);
+
+    box-shadow:
+        inset 0 0 80px rgba(180, 140, 80, 0.35),
+        inset 0 0 160px rgba(140, 90, 40, 0.25),
+        inset 0 0 40px rgba(0, 0, 0, 0.08);
 }
 
 @keyframes fadeIn1 {
@@ -36,7 +68,7 @@ body {
     height: 100dvh;
     max-width: 1000px;
     margin: 0 auto;
-    background: #ffffff;
+    background: #ffffff40;
     animation: fadeIn1 0.3s ease-in-out;
 }
 
@@ -47,8 +79,8 @@ body {
     font-size: 17px;
     font-weight: 700;
     border: none;
-    color: #004dba;
-    background: linear-gradient(to right, #93e9ff, #ff55ff) no-repeat;
+    color: #003176;
+    background: linear-gradient(to right, #007694, #6b006b) no-repeat;
     background-size: 0 2px;
     background-position: center bottom;
     transition: all 0.3s ease;
@@ -73,8 +105,8 @@ body {
 }
 
 .note:hover {
-    background: #0059ff20;
-    color: #0059ff;
+    background: #075eff40;
+    /* color: #003daf; */
 }
 
 .noteditor,
