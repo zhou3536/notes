@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .drag-active { border-color: #3b82f6 !important; background-color: #eff6ff !important; }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+        
+        <header class="flex items-center justify-between">
+            <h1 class="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+                <svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                我的文件
+            </h1>
+        </header>
+
+        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-10 transition-all duration-200" id="dropzone">
+            <input type="file" id="fileInput" class="hidden" multiple>
+            <div class="flex flex-col items-center justify-center space-y-4 cursor-pointer text-center" onclick="document.getElementById('fileInput').click()">
+                <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-2">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                </div>
+                <div>
+                    <p class="text-lg font-medium text-gray-700">点击或将文件拖拽到这里上传</p>
+                    <p class="text-sm text-gray-400 mt-1">支持批量上传任意格式文件</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="uploadContainer" class="hidden space-y-3">
+            <h2 class="text-sm font-medium text-gray-500 px-1">上传任务</h2>
+            <div id="uploadList" class="space-y-2"></div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                            <th class="py-4 px-6 text-sm font-medium text-gray-500">文件名</th>
+                            <th class="py-4 px-6 text-sm font-medium text-gray-500 w-32">大小</th>
+                            <th class="py-4 px-6 text-sm font-medium text-gray-500 w-40 text-right">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fileListBody" class="divide-y divide-gray-100">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center">
+                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                <p class="text-gray-500 font-medium">暂无文件</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = 'https://nn.855955.xyz/rr';
+        
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileListBody = document.getElementById('fileListBody');
+        const emptyState = document.getElementById('emptyState');
+        const uploadContainer = document.getElementById('uploadContainer');
+        const uploadList = document.getElementById('uploadList');
+
+        // Utility: Format File Size
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Initialize API calls
+        async function fetchFiles() {
+            try {
+                const response = await fetch(`${API_BASE}/files`);
+                if (!response.ok) throw new Error('网络请求失败');
+                const files = await response.json();
+                renderFileList(files);
+            } catch (error) {
+                console.error('获取列表失败:', error);
+                // 模拟数据回退测试逻辑 (可选，仅用于没有后端环境的UI查看)
+                // renderFileList([{name: "example_document.pdf", size: 1048576}, {name: "design_assets.zip", size: 25600000}]);
+            }
+        }
+
+        // Render File List
+        function renderFileList(files) {
+            fileListBody.innerHTML = '';
+            
+            if (!files || files.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            files.forEach(file => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/50 transition-colors group';
+                tr.innerHTML = `
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            <span class="text-sm font-medium text-gray-700 truncate max-w-[200px] md:max-w-md">${file.name}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-sm text-gray-500">${formatSize(file.size)}</td>
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href="${API_BASE}/${encodeURIComponent(file.name)}" download class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors" title="下载">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </a>
+                            <button onclick="deleteFile('${file.name}')" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="删除">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                fileListBody.appendChild(tr);
+            });
+        }
+
+        // Delete File
+        async function deleteFile(filename) {
+            if (!confirm(`确定要删除文件 "${filename}" 吗？此操作无法恢复。`)) return;
+            
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                
+                if (!response.ok) throw new Error('删除失败');
+                
+                // 刷新列表
+                fetchFiles();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Upload Files
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            uploadContainer.classList.remove('hidden');
+
+            Array.from(files).forEach(file => {
+                const taskId = 'task_' + Math.random().toString(36).substr(2, 9);
+                createProgressElement(taskId, file.name);
+                uploadFileXHR(file, taskId);
+            });
+        }
+
+        // Create Progress UI
+        function createProgressElement(taskId, filename) {
+            const el = document.createElement('div');
+            el.id = taskId;
+            el.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4';
+            el.innerHTML = `
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700 truncate">${filename}</span>
+                        <span class="text-xs font-medium text-blue-500 progress-text">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5">
+                        <div class="bg-blue-500 h-1.5 rounded-full transition-all duration-300 progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="status-icon text-gray-300">
+                    <svg class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </div>
+            `;
+            uploadList.appendChild(el);
+        }
+
+        // Execute Upload via XMLHttpRequest for tracking progress
+        function uploadFileXHR(file, taskId) {
+            const formData = new FormData();
+            formData.append('file', file); // 若后端需要别的字段名(如files[])，在此修改
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', API_BASE, true);
+
+            const taskEl = document.getElementById(taskId);
+            const progressBar = taskEl.querySelector('.progress-bar');
+            const progressText = taskEl.querySelector('.progress-text');
+            const statusIcon = taskEl.querySelector('.status-icon');
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = percent + '%';
+                    progressText.textContent = percent + '%';
+                }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    // Success
+                    progressBar.classList.replace('bg-blue-500', 'bg-green-500');
+                    progressText.classList.replace('text-blue-500', 'text-green-500');
+                    progressText.textContent = '完成';
+                    statusIcon.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                    
+                    // Refresh List
+                    fetchFiles();
+                    
+                    // Auto remove progress item after 3 seconds
+                    setTimeout(() => {
+                        taskEl.remove();
+                        if (uploadList.children.length === 0) {
+                            uploadContainer.classList.add('hidden');
+                        }
+                    }, 3000);
+                } else {
+                    // Error
+                    handleUploadError(taskEl, progressBar, progressText, statusIcon);
+                }
+            };
+
+            xhr.onerror = () => handleUploadError(taskEl, progressBar, progressText, statusIcon);
+            xhr.send(formData);
+        }
+
+        function handleUploadError(taskEl, progressBar, progressText, statusIcon) {
+            progressBar.classList.replace('bg-blue-500', 'bg-red-500');
+            progressText.classList.replace('text-blue-500', 'text-red-500');
+            progressText.textContent = '失败';
+            statusIcon.innerHTML = `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+        }
+
+        // Event Listeners for Drag and Drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.add('drag-active');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.remove('drag-active');
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        // Event Listener for Click Upload
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+            this.value = ''; // Reset input so identical files can trigger change again
+        });
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', fetchFiles);
+
+    </script>
+</body>
+</html>
