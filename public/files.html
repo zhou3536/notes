@@ -261,6 +261,7 @@
         <circle r="20" cy="50" cx="50"></circle>
     </svg>
     <script>
+        const path = '/rr';
         const loader = document.getElementById('loader');
         const copyfile = document.getElementById('copyfile');
         const progressBar = document.getElementById('progressBar');
@@ -306,7 +307,7 @@
 
                 xhr.addEventListener('error', () => reject());
 
-                xhr.open('POST', '/rr');
+                xhr.open('POST', path);
                 xhr.send(formData);
             });
         }
@@ -320,8 +321,8 @@
             copyfile.style.display = 'none';
             try {
                 loader.style.display = 'block';
-                // const res = await fetch('../rr.json');
-                const res = await fetch('/rr/files');
+                // const res = await fetch('2.json');
+                const res = await fetch(path + '/files');
                 files = await res.json();
             } catch (err) {
                 files = { name: `加载失败，网络错误：${err.message}` };
@@ -354,12 +355,12 @@
             title.classList.add('title22');
             const a = document.createElement("a");
             a.innerText = '链接';
-            a.href = '/rr/' + name;
+            a.href = `${path}/${name}`;
             a.target = '_blank';
             const a2 = document.createElement("a");
             a2.setAttribute("download", name);
             a2.innerText = '下载';
-            a2.href = '/rr/' + name;
+            a2.href = `${path}/${name}`;
             a2.style.marginRight = 'auto';
             const clsbtn = document.createElement("button");
             clsbtn.innerText = '关闭';
@@ -368,11 +369,11 @@
             delbtn.innerText = '删除';
             delbtn.addEventListener('click', () => { deletefile(name) });
             const text = document.createElement("div");
-            text.innerText = `路径：/rr/${name}
-                                HTML标签：<a href="/rr/${name}">${name}</a>
-                                HTML标签：<img src="/rr/${name}" alt="">
-                                md图片标签：![](/rr/${name})
-                                md链接标签：[${name}](/rr/${name})  
+            text.innerText = `路径：${path}/${name}
+                                HTML标签：<a href="${path}/${name}">${name}</a>
+                                HTML标签：<img src="${path}/${name}" alt="">
+                                md图片标签：![](${path}/${name})
+                                md链接标签：[${name}](${path}/${name})  
             `;
             title.appendChild(a);
             title.appendChild(a2);
@@ -388,7 +389,7 @@
             if (!userConfirmed) { return }
             try {
                 loader.style.display = 'block';
-                const res = await fetch("/rr", {
+                const res = await fetch(path, {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ filename })
@@ -409,11 +410,11 @@
         };
         function copytext(name, type) {
 
-            let text = '/rr/' + name;
+            let text = `${path}/${name}`;
             if (type === 'img') {
-                text = `<img src="/rr/${name}" alt="">`
+                text = `<img src="${path}/${name}" alt="">`
             } else if (type === 'md') {
-                text = `![](/rr/${name})`
+                text = `![](${path}/${name})`
             }
             navigator.clipboard.writeText(text).then(() => {
                 console.log("复制", text);
