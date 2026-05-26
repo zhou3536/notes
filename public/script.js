@@ -22,7 +22,7 @@
         getNotesList();
 
         function renderNotes() {
-            container.style.display = 'block';
+            container.style.display = 'grid';
             container.innerHTML = "";
             notes.forEach((note, index) => {
                 const div = document.createElement("a");
