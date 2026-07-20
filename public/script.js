@@ -45,6 +45,7 @@ async function hashchange() {
     loader.style.display = 'block';
     notedisplayBOX.innerHTML = '';
     notedisplayBOX.style.display = 'block';
+    let note;
     try {
         const res = await fetch(`/notes/note_${id}`);
         if (res.ok) {
