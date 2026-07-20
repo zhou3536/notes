@@ -1,9 +1,4 @@
-import { checkAuth } from "../utils/auth";
-
 export async function onRequestGet(context) {
-    if (!checkAuth(context.request, context.env)) {
-        return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": "Basic" } });
-    }
     const { env } = context;
     let key = context.params.rr;
 

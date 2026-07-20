@@ -1,0 +1,8 @@
+# Dependencies
+.wrangler/
+.env
+node_modules/
+package.json
+package-lock.json
+schema.sql
+wrangler.toml
