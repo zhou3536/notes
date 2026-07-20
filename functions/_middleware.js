@@ -1,7 +1,7 @@
 
 let SECRET_KEY;
 const COOKIE_NAME = "auth_token";
-const COOKIE_DAYS = 7;
+const COOKIE_DAYS = 2;
 
 // 简单签名：内容 + 密钥的哈希
 async function sign(value) {
@@ -16,13 +16,6 @@ async function sign(value) {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function createToken() {
-  const expires = Date.now() + COOKIE_DAYS * 24 * 60 * 60 * 1000;
-  const payload = `auth:${expires}`;
-  const sig = await sign(payload);
-  return `${payload}:${sig}`;
-}
-
 async function verifyToken(token) {
   if (!token) return false;
   const parts = token.split(":");
@@ -32,12 +25,9 @@ async function verifyToken(token) {
   if (Date.now() > parseInt(expires)) return false;
   const payload = `${prefix}:${expires}`;
   const expectedSig = await sign(payload);
-  if (sig === expectedSig) {
-    const needsRenewal = Date.now() > (parseInt(expires) - 6 * 86400000);
-    return needsRenewal ? '2' : '1';
-  } else {
-    return false;
-  }
+  if (sig !== expectedSig) return false;
+
+  return true;
 }
 
 export async function onRequest({ request, next, env }) {
@@ -58,18 +48,8 @@ export async function onRequest({ request, next, env }) {
   );
   const token = cookies[COOKIE_NAME];
   const isValid = await verifyToken(token);
-  if (isValid === '1') return next();
-  if (isValid === '2') {
-    // 续期：重置7天
-    const newToken = await createToken();
-    const response = await next();
-    const newResponse = new Response(response.body, response);
-    newResponse.headers.append(
-      "Set-Cookie",
-      `${COOKIE_NAME}=${encodeURIComponent(newToken)}; Path=/; Max-Age=${COOKIE_DAYS * 86400}; HttpOnly; SameSite=Lax`
-    );
-    return newResponse;
-  }
+  if (isValid) return next();
+
 
   // 未登录，跳转到登录页
   const fromUrl = url.pathname + url.search;
