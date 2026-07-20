@@ -15,10 +15,6 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPost(context) {
-  if (!checkAuth(context.request, context.env)) {
-    return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": "Basic" } });
-  }
-
   const body = await context.request.json();
   if (body.action === 'ReloadList') {
     await ReloadList(context.env);
@@ -34,10 +30,6 @@ export async function onRequestPost(context) {
 }
 
 export async function onRequestDelete(context) {
-  if (!checkAuth(context.request, context.env)) {
-    return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": "Basic" } });
-  }
-
 
   const body = await context.request.json();
   if (!body.id) {
