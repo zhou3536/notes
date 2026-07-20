@@ -242,7 +242,6 @@ window.addEventListener('beforeunload', function (event) {
 });
 
 async function logout() {
-    console.log('11')
     const confirm1 = confirm('退出登录');
     if (!confirm1) return;
     const response = await fetch("/logout");
