@@ -73,7 +73,13 @@ body {
     animation: fadeIn1 0.3s ease-in-out;
 }
 
+#app .btn_box {
+    display: flex;
+    margin-bottom: 10px;
+}
+
 #app button {
+    display: block;
     padding: 3px 0;
     margin: 5px;
     margin-left: 0;
@@ -109,13 +115,13 @@ body {
     border-radius: 8px;
     /* width: fit-content; */
     transition: all 0.3s ease;
-    background: #0059ff10;
-    box-shadow: 3px 5px 5px #00000050;
+    background: #ffffff30;
+    box-shadow: 3px 5px 10px #00000050;
 }
 
 .note:hover {
     /* background: #075eff20; */
-    box-shadow: 3px 5px 8px #00000080;
+    box-shadow: 3px 5px 10px #00000080;
 }
 
 .noteditor,

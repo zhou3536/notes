@@ -12,8 +12,11 @@
 
 <body>
     <div id="app">
-        <button onclick="editornote()">写笔记</button>
-        <button onclick="window.open('files.html', '_blank')">上传文件</button>
+        <div class="btn_box">
+            <button onclick="editornote()">写笔记</button>
+            <button onclick="window.open('files.html', '_blank')">上传文件</button>
+            <button onclick="logout()" style="margin-left: auto">Logout</button>
+        </div>
         <div id="notes"></div>
     </div>
     <div id="notedisplay" class="notedisplay"></div>
