@@ -9,8 +9,8 @@ const container = document.getElementById("notes");
 async function getNotesList() {
     try {
         loader.style.display = 'block';
-        const res = await fetch("1.json");  // test
-        // const res = await fetch("/notes/AllNotes");
+        // const res = await fetch("1.json");  // test
+        const res = await fetch("/notes/AllNotes");
         if (!res.ok) return;
         notes = await res.json();
         app.style.display = "block";
