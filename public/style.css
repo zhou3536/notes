@@ -69,7 +69,7 @@ body {
     height: 100dvh;
     max-width: 1000px;
     margin: 0 auto;
-    background: #ffffff40;
+    /* background: #ffffff40; */
     animation: fadeIn1 0.3s ease-in-out;
 }
 
@@ -81,9 +81,9 @@ body {
 #app button {
     display: block;
     padding: 3px 0;
-    margin: 5px;
+    margin: 8px;
     margin-left: 0;
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
     border: none;
     color: #003176;
@@ -115,7 +115,7 @@ body {
     border-radius: 8px;
     /* width: fit-content; */
     transition: all 0.3s ease;
-    background: #ffffff30;
+    background: #ffffff90;
     box-shadow: 3px 5px 10px #00000050;
 }
 

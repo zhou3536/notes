@@ -18,13 +18,20 @@
       align-items: center;
       justify-content: center;
       font-family: system-ui, sans-serif;
+      background: 
+            radial-gradient(55% 330%, rgba(255, 255, 255, 0.5) 0%, rgba(0, 0, 0, 0.5) 550%), 
+            linear-gradient(to top, rgba(255, 255, 255, 0.5) 0%, rgba(0, 0, 0, 0.6) 50%), 
+            linear-gradient(to top right, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 120%);
+        background-color: #DFE3E4;
+        background-blend-mode: color-burn, screen, color-burn;
     }
 
     .card {
-      border: 2px solid #00000060;
+      /* border: 2px solid #00000060; */
       padding: 20px;
       width: 300px;
       border-radius: 10px;
+      box-shadow: 0 3px 15px #00000060;
     }
 
     h1 {
@@ -38,12 +45,13 @@
       width: 100%;
       padding: 8px 10px;
       background: transparent;
-      border: 2px solid #00000030;
+      border: 2px solid #6588b381;
       border-radius: 8px;
       color: #000;
       font-size: 15px;
       margin-bottom: 18px;
       outline: none;
+      transition: all 0.3s ease-in-out;
     }
 
     input:focus {
@@ -52,14 +60,19 @@
 
     button {
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       background: #6e98ec;
       color: #fff;
       border: none;
       border-radius: 8px;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    button:hover {
+      background: #3771e4;
     }
 
     .error {
@@ -75,12 +88,13 @@
 <body>
   <div class="card">
     <h1>账号登录</h1>
-    <input type="text" id="username" placeholder="请输入用户名" autocomplete="username">
-    <input type="password" id="password" placeholder="请输入密码" autocomplete="current-password">
-    <button onclick="login()">登 录</button>
+    <input type="text" id="username" placeholder="用户名" autocomplete="username">
+    <input type="password" id="password" placeholder="密码" autocomplete="current-password">
+    <button id="login_btn" onclick="login()">登 录</button>
     <div class="error" id="error"></div>
   </div>
   <script>
+    const login_btn = document.getElementById('login_btn');
     async function login() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value;
@@ -88,6 +102,7 @@
       error_box.textContent = "";
       if (!username || !password) { error_box.textContent = '请输入用户名和密码'; return }
       try {
+        login_btn.disabled = true;
         const res = await fetch("/login", {
           method: "POST",
           credentials: "same-origin",
@@ -109,6 +124,8 @@
         }
       } catch (error) {
         error_box.textContent = error?.message || "登录失败";
+      } finally {
+        login_btn.disabled = false;
       }
     }
 
