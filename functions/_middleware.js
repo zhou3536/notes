@@ -1,9 +1,7 @@
 
 let SECRET_KEY;
 const COOKIE_NAME = "auth_token";
-const COOKIE_DAYS = 2;
 
-// 简单签名：内容 + 密钥的哈希
 async function sign(value) {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(

@@ -1,6 +1,6 @@
 let SECRET_KEY;
 const COOKIE_NAME = "auth_token";
-const COOKIE_DAYS = 7;
+const COOKIE_DAYS = 2;
 
 async function sign(value) {
   const encoder = new TextEncoder();
