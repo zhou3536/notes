@@ -9,8 +9,9 @@ const container = document.getElementById("notes");
 async function getNotesList() {
     try {
         loader.style.display = 'block';
-        // const res = await fetch("1.json");  // test
-        const res = await fetch("/notes/AllNotes");
+        const isLocal = window.location.hostname === '127.0.0.1';
+        const Path = isLocal ? 'test.json' : '/notes/AllNotes';
+        const res = await fetch(Path);
         if (!res.ok) return;
         notes = await res.json();
         app.style.display = "block";
@@ -39,9 +40,11 @@ async function hashchange() {
     noteditorBOX.style.display = 'none';
     const id = window.location.hash.substring(1);
     if (!id) {
+        app.style.display = 'block';
         notedisplayBOX.style.display = 'none';
         return;
     };
+    app.style.display = 'none';
     loader.style.display = 'block';
     notedisplayBOX.innerHTML = '';
     notedisplayBOX.style.display = 'block';
