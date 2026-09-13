@@ -7,8 +7,30 @@
 body {
     font-family: sans-serif;
     min-height: 100vh;
-
-    background-color: #fffaf3;
+    background-color: #0b0f19;
+    /* 2. 复合渐变：多层径向渐变光晕 + 科技感网格线叠加 */
+    background-color: #f8fafc;
+    /* 2. 复合渐变：细微浅色网格 + 马卡龙柔彩光晕叠加 */
+    background-image:
+        /* 浅灰微网格线 */
+        linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+        /* 左上角清凉天蓝色光晕 */
+        radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.22) 0%, transparent 40%),
+        /* 右上角蜜桃暖粉色光晕 */
+        radial-gradient(circle at 90% 15%, rgba(244, 114, 182, 0.2) 0%, transparent 45%),
+        /* 正中心偏下梦幻紫色提亮 */
+        radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.18) 0%, transparent 50%),
+        /* 左下角薄荷青绿光斑，提亮通透感 */
+        radial-gradient(circle at 15% 85%, rgba(45, 212, 191, 0.18) 0%, transparent 35%);
+    /* 网格尺寸与定位 */
+    background-size:
+        48px 48px,
+        48px 48px,
+        100% 100%,
+        100% 100%,
+        100% 100%,
+        100% 100%;
     background-attachment: fixed;
 }
 
@@ -78,15 +100,17 @@ body {
     display: block;
     height: 90px;
     text-decoration: none;
-    color: #000;
+    color: #444;
     cursor: default;
     padding: 10px;
-    /* margin: 5px 0; */
-    border-radius: 8px;
-    /* width: fit-content; */
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 12px;
     transition: all 0.3s ease;
-    background: #ffffff;
+    background: #ffffff80;
     box-shadow: 3px 5px 10px #00000050;
+    display: grid;
+    place-items: center;
 }
 
 .note:hover {
