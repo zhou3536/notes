@@ -249,7 +249,7 @@ async function logout() {
     if (!confirm1) return;
     const response = await fetch("/logout");
     if (response.ok) {
-        window.location.reload();
+        window.location.href = '/cdn-cgi/access/logout';
     } else {
         alert('网络错误')
     }
