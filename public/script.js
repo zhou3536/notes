@@ -14,7 +14,7 @@ async function getNotesList() {
         const res = await fetch(Path);
         if (!res.ok) return;
         notes = await res.json();
-        app.style.display = "block";
+        app.style.display = "";
         renderNotes();
     } finally {
         loader.style.display = 'none';
